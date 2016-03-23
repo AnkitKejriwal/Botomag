@@ -47,7 +47,7 @@ namespace Botomag.Web.Controllers
         /// </summary>
         /// <param name="id">Id is token which was set when setup webhook</param>
         /// <returns>Json result with message response</returns>
-        [RequireHttps]
+        //[RequireHttps]
         [HttpPost]
         public async Task<ActionResult> PostMessages(Guid? id = null)
         {
