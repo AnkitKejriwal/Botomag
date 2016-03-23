@@ -234,3 +234,7 @@ _Pvt_Extensions
 
 # FAKE - F# Make
 .fake/
+/Botomag.Web/ConnectionDebug.config
+/Botomag.Web/ConnectionRelease.config
+/Botomag.Web/PrivateSettingDebug.config
+/Botomag.Web/PrivateSettingsRelease.config
