@@ -55,6 +55,19 @@ namespace Botomag.Web.Infrastructure
                 update.Message.Text = update.Message.Text.Substring(("@" + botName).Length);
             }
 
+            if (update.Message.Text.ToLower().Trim() == "/start")
+            {
+                return new
+                {
+                    method = "sendMessage",
+                    text = "Для того, чтобы получить информацию о бое, просто введите коэффициент. В качестве разделителя целой " +
+                    "и дробной частей, используйте запятую: \",\"",
+                    chat_id = update.Message.Chat.Id,
+                    reply_to_message_id = update.Message.Message_Id,
+                    parse_mode = "HTML"
+                };
+            }
+
             decimal factor;
 
             if (decimal.TryParse(update.Message.Text, out factor) == true)
@@ -67,13 +80,13 @@ namespace Botomag.Web.Infrastructure
                     strb.AppendLine("Результат:");
                     foreach (FightModel fight in fights)
                     {
-                        strb.AppendLine(string.Format("<b>Дата:</b> {0} <b>Организация:</b> {1}, <b>Тип:</b> {2}, <b>Бой:</b> {3}", fight.Date, fight.Organization.Title, fight.BetType.Title, fight.Bet));
+                        strb.AppendLine(string.Format("<b>Дата:</b> {0} <b>Организация:</b> {1}, <b>Тип:</b> {2}, <b>Бой:</b> {3}, <b>Коэффициент</b> {4}", fight.Date, fight.Organization.Title, fight.BetType.Title, fight.Bet, fight.Factor));
                     }
                     string link = CacheHelper.GetOrSet<string>(
                         CacheKeys.PartnerLink,
                         applicationState,
                         () => AppConfigHelper.GetValue<string>(AppConfigKeys.PartnerLink, str => str));
-                    strb.AppendLine("Вы можете сделать ставку, например, <a href=\"" + link + "\">здесь</a>");
+                    strb.AppendLine("Пройди по ссылке и сделай ставку: <a href=\"" + link + "\">" + link + "</a>");
                     result = strb.ToString();
                 }
                 return new  
@@ -133,6 +146,19 @@ namespace Botomag.Web.Infrastructure
                 update.Message.Text = update.Message.Text.Substring(("@" + botName).Length);
             }
 
+            if (update.Message.Text.ToLower().Trim() == "/start")
+            {
+                return new
+                {
+                    method = "sendMessage",
+                    text = "Для того, чтобы получить информацию о бое, просто введите коэффициент. В качестве разделителя целой " +
+                    "и дробной частей, используйте запятую: \",\"",
+                    chat_id = update.Message.Chat.Id,
+                    reply_to_message_id = update.Message.Message_Id,
+                    parse_mode = "HTML"
+                };
+            }
+
             decimal factor;
 
             if (decimal.TryParse(update.Message.Text, out factor) == true)
@@ -145,13 +171,13 @@ namespace Botomag.Web.Infrastructure
                     strb.AppendLine("Результат:");
                     foreach (FightModel fight in fights)
                     {
-                        strb.AppendLine(string.Format("<b>Дата:</b> {0} <b>Организация:</b> {1}, <b>Тип:</b> {2}, <b>Бой:</b> {3}", fight.Date, fight.Organization.Title, fight.BetType.Title, fight.Bet));
+                        strb.AppendLine(string.Format("<b>Дата:</b> {0} <b>Организация:</b> {1}, <b>Тип:</b> {2}, <b>Бой:</b> {3}, <b>Коэффициент</b> {4}", fight.Date, fight.Organization.Title, fight.BetType.Title, fight.Bet, fight.Factor));
                     }
                     string link = await CacheHelper.GetOrSetAsync<string>(
                         CacheKeys.PartnerLink,
                         applicationState,
                         () => AppConfigHelper.GetValue<string>(AppConfigKeys.PartnerLink, str => str));
-                    strb.AppendLine("Вы можете сделать ставку, например, <a href=\"" + link + "\">здесь</a>");
+                    strb.AppendLine("Пройди по ссылке и сделай ставку: <a href=\"" + link + "\">" + link + "</a>");
                     result = strb.ToString();
                 }
                 return new
