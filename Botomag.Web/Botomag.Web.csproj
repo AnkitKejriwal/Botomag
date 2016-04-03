@@ -117,12 +117,14 @@
     <Content Include="Content\img\em.png" />
     <Content Include="Content\img\ios.png" />
     <Content Include="Content\img\logo.png" />
+    <Content Include="Content\img\questplat.png" />
     <Content Include="Content\img\s1_1.png" />
     <Content Include="Content\img\s1_2.png" />
     <Content Include="Content\img\s1_3.png" />
     <Content Include="Content\img\serv.png" />
     <Content Include="Content\img\shadow.png" />
     <Content Include="Content\img\SplitDecision.png" />
+    <Content Include="Content\img\underconst.png" />
     <Content Include="Content\img\vk.png" />
     <Content Include="Content\normalize.css" />
     <Content Include="Content\owl.carousel.css" />
