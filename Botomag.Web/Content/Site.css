@@ -1,0 +1,230 @@
+﻿@font-face {
+	font-family: 'PFAgoraSansPro';
+	font-style: normal;
+	font-weight: 300;
+	src: url('../fonts/AgoraSansProLight.ttf') format('truetype');
+}
+@font-face {
+	font-family: 'PFAgoraSansPro';
+	font-style: italic;
+	font-weight: 300;
+	src: url('../fonts/AgoraSansProLightItalic.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'PFAgoraSansPro';
+	font-style: normal;
+	font-weight: 400;
+	src: url('../fonts/AgoraSansProMedium.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'PFAgoraSansPro';
+	font-style: italic;
+	font-weight: 400;
+	src: url('../fonts/AgoraSansProMediumItalic/AgoraSansProMediumItalic.ttf') format('truetype');
+}
+
+body {
+	font-family: 'PFAgoraSansPro';
+	font-weight: 300;
+	position: relative;
+}
+
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+    font-family: 'PFAgoraSansPro';
+    font-weight: 500;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+.navbar {
+    margin-bottom: 0;
+    z-index: 0;
+}
+
+.navbar-default {
+    border-bottom-width: 0;
+    border-radius: 0;
+    border: 0 solid;
+}
+
+.header {
+    position:relative
+}
+
+.header_sidebar {
+    width: 100%;
+    background: rgba(0,91,131,.89);
+}
+
+.header_slider {
+    position:relative
+}
+
+.social {
+    margin: 20px 0 10px 20px;
+    height: 34px;
+    width: 34px;
+    display: inline-block;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: 34px 34px;
+    float: right;
+}
+
+.owl-item div {
+    height: 670px;
+    width: 100%;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.header_article {
+    z-index: 1;
+    height: 500px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    background: url(img/shadow.png) center center no-repeat;
+    background-size: 100% 100%;
+    text-align: center;
+    color: #fff;
+    box-sizing: border-box;
+    padding-top: 85px;
+    font-size: 23px;
+    line-height: 1.4;
+}
+
+.btn-ios {
+    display: inline-block;
+    text-decoration: none;
+    color: #fff;
+    font-size: 17px;
+    background: url(img/ios.png) #f57f17 9px 7px no-repeat;
+    padding: 15px 18px 14px 60px;
+    border-radius: 6px;
+    margin: 22px 18px;
+}
+
+.ios-popup {
+    z-index: 100;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: rgba(0,0,0,.5);
+}
+
+.ios-body {
+    background: #fff;
+    border: 3px solid #f57f17;
+    border-radius: 14px;
+    line-height: 1.5;
+    height: 380px;
+    width: 350px;
+    box-sizing: border-box;
+    font-size: 21px;
+    padding: 50px 30px 35px 30px;
+    position: absolute;
+}
+
+.ios-popup .ios-body input {
+    border: 1px solid #b5b5b5;
+    width: 100%;
+    padding: 12px;
+    box-sizing: border-box;
+    border-radius: 6px;
+    font-size: 18px;
+    margin-bottom: 18px;
+    margin-top: 43px;
+}
+
+.ios-popup .ios-body button {
+    border: none;
+    background: #f57f17;
+    color: #fff;
+    width: 100%;
+    padding: 12px;
+    box-sizing: border-box;
+    border-radius: 6px;
+    font-size: 18px;
+}
+
+.ios-triangle {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 48px 48px 0 0;
+    border-color: #f57f17 transparent transparent transparent;
+    position: absolute;
+    bottom: -48px;
+}
+
+.ios-triangle-triangle {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 42px 42px 0 0;
+    border-color: #fff transparent transparent transparent;
+    position: absolute;
+    top: -48px;
+    left: 2px;
+}
+
+.ios-msg {
+    z-index: 100;
+    background: #fff;
+    border: 3px solid #f57f17;
+    border-radius: 14px;
+    line-height: 1.5;
+    height: 100px;
+    width: 400px;
+    box-sizing: border-box;
+    font-size: 21px;
+    padding: 30px 30px 35px 30px;
+    position: absolute;
+    right: 50px;
+    bottom: 50px;
+}
+
+.info_bis {
+    vertical-align: top;
+    box-sizing: border-box;
+    width: 100%;
+    font-size: 25px;
+    line-height: 1.3;
+}
+
+.title_bis {
+    font-weight: 400;
+    font-size: 30px;
+    text-align: center;
+    line-height: 1;
+    margin: 48px 0 28px 0;
+}
+
+.footer {
+    background: #1c6d91;
+    text-align: center;
+    padding: 20px 0 12px 0;
+    font-size: 18px;
+    color: #fff;
+    font-weight: 400;
+    margin-top: 20px;
+}

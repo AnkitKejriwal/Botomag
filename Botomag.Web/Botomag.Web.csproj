@@ -112,7 +112,36 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\bootstrap.css" />
+    <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\img\em.png" />
+    <Content Include="Content\img\ios.png" />
+    <Content Include="Content\img\logo.png" />
+    <Content Include="Content\img\s1_1.png" />
+    <Content Include="Content\img\s1_2.png" />
+    <Content Include="Content\img\s1_3.png" />
+    <Content Include="Content\img\serv.png" />
+    <Content Include="Content\img\shadow.png" />
+    <Content Include="Content\img\SplitDecision.png" />
+    <Content Include="Content\img\vk.png" />
+    <Content Include="Content\normalize.css" />
+    <Content Include="Content\owl.carousel.css" />
+    <Content Include="Content\Site.css" />
+    <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
+    <Content Include="Scripts\bootstrap.js" />
+    <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="fonts\AgoraSansProLight.ttf" />
+    <Content Include="fonts\AgoraSansProLightItalic.ttf" />
+    <Content Include="fonts\AgoraSansProMedium.ttf" />
+    <Content Include="fonts\AgoraSansProMediumItalic.ttf" />
+    <None Include="Scripts\jquery-1.10.2.intellisense.js" />
+    <Content Include="Scripts\jquery-1.10.2.js" />
+    <Content Include="Scripts\jquery-1.10.2.min.js" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
+    <Content Include="Scripts\modernizr-2.6.2.js" />
+    <Content Include="Scripts\owl.carousel.js" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -127,6 +156,7 @@
     </Compile>
     <Compile Include="Infrastructure\AppConfigHelper.cs" />
     <Compile Include="Infrastructure\CacheHelper.cs" />
+    <Compile Include="Infrastructure\UrlHelperExtensions.cs" />
     <Compile Include="Infrastructure\WebhookHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -138,10 +168,16 @@
     </Content>
     <Content Include="ConnectionDebug.config" />
     <None Include="ConnectionRelease.config" />
-    <Content Include="Views\Home\Index.cshtml" />
     <Content Include="PrivateSettingsDebug.config" />
+    <Content Include="fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <None Include="Properties\PublishProfiles\Local IIS Debug.pubxml" />
     <None Include="Properties\PublishProfiles\Web Release.pubxml" />
+    <Content Include="Views\_ViewStart.cshtml" />
+    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Scripts\jquery-1.10.2.min.map" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
       <SubType>Designer</SubType>

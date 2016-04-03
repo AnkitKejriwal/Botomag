@@ -21,16 +21,21 @@ namespace Botomag.Web.Controllers
         #region Properties and Fields
 
         IBaseBotService _botService;
-        ISplitDecisionBotService _fightService;
+        ISplitDecisionBotService _splitDecisionService;
+        IMailService _mailService;
 
         #endregion Properties and Fields
 
         #region Constructors
 
-        public HomeController(IBaseBotService botService, ISplitDecisionBotService fightService)
+        public HomeController(
+            IBaseBotService botService, 
+            ISplitDecisionBotService splitDecisionService, 
+            IMailService mailService)
         {
             _botService = botService;
-            _fightService = fightService;
+            _splitDecisionService = splitDecisionService;
+            _mailService = mailService;
         }
 
         #endregion Constructors
@@ -39,7 +44,7 @@ namespace Botomag.Web.Controllers
 
         public ActionResult Index()
         {
-            return null;
+            return View();
         }
 
         /// <summary>
@@ -61,7 +66,7 @@ namespace Botomag.Web.Controllers
                 if (id == telegramPostToken)
                 {
                     Update update = await _botService.ReadMessageAsync<Update>(Request.InputStream);
-                    object result = await WebhookHelper.ProcessMessageAsync(update, HttpContext.Application, _botService, _fightService);
+                    object result = await WebhookHelper.ProcessMessageAsync(update, HttpContext.Application, _botService, _splitDecisionService);
                     if (result != null)
                     {
                         return new JsonResult { Data = result };
@@ -70,6 +75,13 @@ namespace Botomag.Web.Controllers
             }
 
             return null;
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> SendMessage(string email, string message, string recipient)
+        {
+            await _mailService.SendMessageAsync(recipient, message, email);
+            return new JsonResult();
         }
 
         #endregion Methods

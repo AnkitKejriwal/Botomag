@@ -19,5 +19,9 @@ namespace Botomag.Web.Controllers
         #region Constructors
 
         #endregion Constructors
+
+        #region Methods
+
+        #endregion Methods
     }
 }

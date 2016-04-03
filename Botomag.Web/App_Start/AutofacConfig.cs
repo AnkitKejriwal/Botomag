@@ -31,6 +31,8 @@ namespace Botomag.Web
 
             builder.RegisterType<SplitDecisionBotService>().As<ISplitDecisionBotService>();
 
+            builder.RegisterType<MailService>().As<IMailService>();
+
             MapperConfiguration config = new MapperConfiguration(cfg => Botomag.BLL.Infrastructure.AutomapperConfig.Configuration(cfg));
             config.AssertConfigurationIsValid();
             IMapper mapper = config.CreateMapper();

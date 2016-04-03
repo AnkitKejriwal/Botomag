@@ -1,18 +1,208 @@
-﻿
+﻿@using Botomag.Web.Infrastructure
 @{
-    Layout = null;
+    ViewBag.Title = "BotoMag";
+    AjaxOptions opt = new AjaxOptions
+    {
+        Url = Url.Action("SendMessage"),
+        OnComplete = "sendMessageSuccess()"
+    };
 }
 
-<!DOCTYPE html>
+@section Styles {
+    <link href="~/Content/owl.carousel.css" rel="stylesheet" type="text/css" />
+}
 
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Index</title>
-</head>
-<body>
-    <div>
-        Start page 
+<div class="ios-popup" style="display: none">
+    <div class="ios-body">
+        Напишите нам Ваш e-mail или иной контакт и мы очень быстро свяжемся с Вами.
+        @using (@Ajax.BeginForm(opt))
+        {
+            <input name="email" type="email" placeholder="E-mail" />
+            <input name="message" value="Хочу сервис" type="hidden" />
+            <input name="recipient" value="contact@botomag.ru" type="hidden" />
+            <button type="submit">Отправить</button>
+        }
+        <div class="ios-triangle">
+            <div class="ios-triangle-triangle">&nbsp;</div>
+        </div>
     </div>
-</body>
-</html>
+</div>
+
+<div class="ios-msg" style="display: none;">
+    <p>Спасибо! Скоро мы свяжемся с Вами!</p>
+</div>
+
+<header class="header">
+    <nav class="header_sidebar navbar navbar-default">
+        <div class="container">
+            <div class="navbar-left">
+                <img src="~/Content/img/logo.png">
+            </div>
+            <div class="navbar-right">
+                <a class="social" style="background-image: url(@Url.AbsoluteContent("~/Content/img/em.png"));" href="mailto:contact@botomag.ru"></a>
+                <a class="social" style="background-image: url(@Url.AbsoluteContent("~/Content/img/vk.png"));" href="http://vk.com/hochustartup" target="_blank"></a>
+            </div>
+        </div>
+    </nav>
+    <div class="header_slider">
+        <div class="owl-carousel">
+            <div style="background-image: url(@Url.AbsoluteContent("~/Content/img/s1_1.png"));"></div>
+            <div style="background-image: url(@Url.AbsoluteContent("~/Content/img/s1_2.png"));"></div>
+            <div style="background-image: url(@Url.AbsoluteContent("~/Content/img/s1_3.png"));"></div>
+        </div>
+        <article class="header_article">
+            <div class="container">
+                <h1>BotoMag - Развивайся Эффективно! </h1>
+                <p>BotoMag - полезные бизнесу, экономные сервисБОТЫ на платформе Telegram. СервисБОТЫ позволяют автоматизировать 
+                    переписку с пользователями или создать умный автоответчик. Боты помогают быстро передавать и принимать любую 
+                    инфомрацию, создавать заказы, напоминать о событиях и многое другое. <br> Оператор почти не нужен! 
+                Передовые технологии дают пользователю максимум результата <b>за минимум действий!</b><br>
+                Хотите узнать как пользоваться сервисБОТАМИ? Посмотрите видео! - 
+                <a href="http://www.youtube.com/channel/UCqlo23KzEZ89hi2HqxHsljA" target=_blank>нажми меня!</a><br>
+                <a href="#" target="_blank" class="btn-ios">ЗАЯВКА</a></p>
+            </div>
+        </article>
+    </div>
+</header>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <h1 class="title_bis"> Примеры возможностей сервисБОТОВ:</h1>
+        </div>
+    </div> 
+    <div class="row" style="padding-top: 100px;">
+        <div class="col-md-6">
+            <div class="info_bis">
+            <b>СервисБОТ @@SplitDecisionBot для получения бесплатных прогнозов на ближайщие MMA-турниры.</b><br>
+            <b>SplitDecisionBot работает просто:</b><br>
+                Запустите бота, введите и отправьте интересующий Вас коэффициент, а в ответ получите информацию максимально 
+                приближенную к запрашиваемому коэффициенту и содержащую - дату, время проведения, события, тип ставки. 
+                При этом Вы получите ссылку на сайт букмекерской конторы, где сразу же можно сделать ставку.<br />
+                <b><a href="http://www.youtube.com/channel/UCqlo23KzEZ89hi2HqxHsljA" target=_blank>@@SplitDecisionBot демовидео на youtube</a> </b> <br>
+                <a href="https://vk.com/splitdecision" target=_blank>SplitDecision в Контакте</a> <br>
+                <a href="http://www.youtube.com/channel/UCvlvloQW1HCk_lj3OzK-8_g" target=_blank>SplitDecision канал Youtube</a>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div style="background: url(@Url.AbsoluteContent("~/Content/img/SplitDecision.png")) center center no-repeat;background-size: contain;height: 400px;"></div>
+        </div>
+    </div>
+    <div class="row" style="padding-top: 100px;">
+        <div class="col-md-6">
+            <div style="background: url(@Url.AbsoluteContent("~/Content/img/serv.png")) center center no-repeat;background-size: contain;height: 250px;"></div>
+        </div>
+        <div class="col-md-6">
+            <div class="info_bis">
+                <b>СервисБОТ СТО @@teststoBot это возможность: </b>
+                <ul>
+                    <li>получать информацию о сервисе в режиме автоответа: расписание, услуги, цены;</li>
+                    <li>связываться с оператором для уточнения деталей или записи;</li>
+                    <li>отправлять доп. материалы оператору - фото, видео, сканы, звуки поломки;</li>
+                    <li>получать информационную рассылку от сервиса.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="padding-top: 100px;">
+        <div class="col-md-6">
+            <div class="info_bis">
+                <b>СервисБОТ для квестов (автоквесты) @@QuestFreakBot позволяет: </b>
+                <ul>
+                    <li>получать информацию о сервисе в режиме автоответа: расписание, услуги, цены;</li>
+                    <li>получать и отправлять загадки в виде текстовых, графических, видео, звуковых данных;</li>
+                    <li>получать и отправлять "ключи" отгадок для продожения действий по чёткой последовательности;</li>
+                    <li>получать информационную рассылку от сервиса;</li>
+                    <li>делать квестодарок, так как не нужно скачивать отдельного приложения специализированного под квест.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div style="background: url(@Url.AbsoluteContent("~/Content/img/questplat.png")) center center no-repeat;background-size: contain;height: 400px;"></div>
+        </div>
+    </div>
+    <div class="row" style="padding-top: 100px;">
+        <div class="col-md-6">
+            <div style="background: url(@Url.AbsoluteContent("~/Content/img/underconst.png")) center center no-repeat;background-size: contain;height: 350px;"></div>
+        </div>
+        <div class="col-md-6">
+            <div class="info_bis">
+                <b>СервисБОТ @@ZakazMasteraBot позволяет:</b>
+                <ul>
+                    <li>получать информацию об услугах мастера в режиме автоответа: расписание, услуги, цены;</li>
+                    <li>связываться с мастером для уточнения деталей или вызова;</li>
+                    <li>отправлять доп.материалы - фото, видео, сканы, звуки поломки;</li>
+                    <li>получать информационную рассылку, например, о мастер-классах.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<footer class="footer">
+    <div class="container">
+        <div>
+            <a class="social" style="background-image: url(@Url.AbsoluteContent("~/Content/img/em.png"));" href="mailto:contact@botomag.ru"></a>
+            <a class="social" style="background-image: url(@Url.AbsoluteContent("~/Content/img/vk.png"));" href="http://vk.com/hochustartup" target="_blank"></a>
+        </div>
+        <div>
+            BotoMag<br /> 
+            Адрес: Кирова, 46.<br /> 
+            © 2016, «BotoMag»
+        </div>
+    </div>
+</footer>          
+
+@section Scripts {
+    <script src="~/Scripts/owl.carousel.js"></script>
+    <script>
+        $(function () {
+            $(".owl-carousel").owlCarousel({
+                items: 1,
+                autoplay: true,
+                autoplaySpeed: 500,
+                loop: true
+            });
+        });
+    </script>
+    <script>
+        $(".btn-ios").click(function (e) {
+            e.preventDefault();
+            var btniosoffset = $(".btn-ios").offset();
+            $(".ios-body").css({
+                left: btniosoffset.left,
+                top: btniosoffset.top - 428
+            });
+            $(".ios-popup").show();
+        });
+        $(".ios-popup").click(function () {
+            $('form').find("input[name='email']").val("");
+            $(this).hide();
+        });
+
+        $(".ios-popup input").click(function (e) {
+            e.stopPropagation();
+        });
+
+        $(".ios-popup button").click(function (e) {
+            e.stopPropagation();
+        });
+
+        $(".ios-body").click(function (e) {
+            e.stopPropagation();
+        });
+    </script>
+    <script>
+        function sendMessageSuccess()
+        {
+            $(".ios-popup").hide();
+            $(".ios-msg").css({
+                left: window.pageXOffset + window.innerWidth - 420,
+                top: window.pageYOffset + window.innerHeight - 120
+            });
+            $(".ios-msg").show(200).delay(2000);
+            setTimeout(function () {
+                $(".ios-msg").hide(200);
+            }, 2000);
+            $('form').find("input[name='email']").val("");
+        }
+    </script>
+}
