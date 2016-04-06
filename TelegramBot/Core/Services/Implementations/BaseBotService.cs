@@ -10,8 +10,8 @@ using System.Reflection;
 using System.ComponentModel.DataAnnotations;
 
 using TelegramBot.Core.Services.Contracts;
-using TelegramBot.Core.Types.MethodParamTypes;
-using TelegramBot.Core.Types.ReturnTypes;
+using TelegramBot.Core.Types.ResponseTypes;
+using TelegramBot.Core.Types.RequestTypes;
 
 namespace TelegramBot.Core.Services.Implementations
 {
@@ -20,214 +20,37 @@ namespace TelegramBot.Core.Services.Implementations
     /// </summary>
     public class BaseBotService : IBaseBotService
     {
-        #region Constructors
 
-        /// <summary>
-        /// Token of telegram bot
-        /// </summary>
-        /// <param name="token"></param>
-        public BaseBotService(string token)
-        {
-            Token = token;
-        }
-
-        #endregion Constructors
-
-        #region Private Properties And Fields
+        #region Properties
 
         private const string _url = "https://api.telegram.org/bot";
 
-        #endregion Private Properties And Fields
+        #endregion Properties
 
-        #region Public Properties And Fields
-
-        public string Token { get; private set; }
-
-        #endregion
+        #region Methods
 
         /// <summary>
-        /// Form url for request
+        /// Read stream of request body from telegram API and deserialize result
+        /// use when webhook is set
         /// </summary>
-        /// <param name="method"></param>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        private string ProcessGetArgs(string method, Dictionary<string, string> param = null)
+        /// <typeparam name="TOutput">Any type derived from BaseResponse</typeparam>
+        /// <param name="stream">Stream of request body</param>
+        /// <returns>BaseResponse derived type with filled properties from request body stream or null if stream can`t
+        /// be deserialize into object of parameter type</returns>
+        /// <exception>ArgumentNullException when stream is null and token in null or empty</exception>
+        public TOutput ReadMessage<TOutput>(Stream stream, string token) where TOutput : BaseResponse
         {
-            if (string.IsNullOrEmpty(method))
+            if (stream == null)
             {
-                throw new ArgumentNullException("method empty or null.");
+                throw new ArgumentNullException("stream.");
             }
 
-            // Form request string
-            string url = _url + Token + "/" + method;
-
-            if (param != null && param.Count > 0)
+            if (string.IsNullOrEmpty(token))
             {
-                string paramSeparator = "?";
-                StringBuilder strb = new StringBuilder();
-
-                foreach (KeyValuePair<string, string> pair in param)
-                {
-                    strb.Append(paramSeparator + pair.Key + "=" + pair.Value);
-                    paramSeparator = "&";
-                }
-
-                url += strb.ToString();
+                throw new ArgumentNullException("token is empty or null.");
             }
 
-            return url;
-        }
-
-        /// <summary>
-        /// Check required method parameters and wrap it to dictionary
-        /// </summary>
-        /// <param name="args"></param>
-        /// <returns></returns>
-        private Dictionary<string, string> CheckParamsAndFormDict(BaseMethodParamType args)
-        {
-            if (args == null)
-            {
-                throw new ArgumentNullException("args");
-            }
-
-            // Check requred params
-            PropertyInfo[] properties = args.GetType().GetProperties();
-            foreach (PropertyInfo prop in properties)
-            {
-                RequiredAttribute req = prop.GetCustomAttribute<RequiredAttribute>();
-                if (req != null)
-                {
-                    object val = prop.GetValue(args);
-                    if (val == null)
-                    {
-                        throw new InvalidOperationException(string.Format("{0} is required", prop.Name));
-                    }
-                    if (val is string && string.IsNullOrEmpty((string)val))
-                    {
-                        throw new InvalidOperationException(string.Format("{0} is required", prop.Name));
-                    }
-                }
-            }
-
-            // Form dictionary of parameters
-            Dictionary<string, string> dict = new Dictionary<string, string>();
-            foreach (PropertyInfo prop in properties)
-            {
-                object propValue = prop.GetValue(args);
-                if (propValue != null)
-                {
-                    dict.Add(prop.Name, propValue.ToString());
-                }
-            }
-            return dict;
-        }
-
-        /// <summary>
-        /// Base method for GET HTTP method to telegram bot API
-        /// throws ArgumentNullException if method is null or empty
-        /// </summary>
-        /// <param name="method"></param>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        public string Get(string method, Dictionary<string, string> param = null)
-        {
-            if (string.IsNullOrEmpty(method))
-            {
-                throw new ArgumentNullException("method empty or null.");
-            }
-
-            // Form request string
-            string url = ProcessGetArgs(method, param);
-
-            // Make request
-            WebRequest request = WebRequest.Create(url);
-
-            string output;
-
-            using (WebResponse response = request.GetResponse())
-            using (Stream stream = response.GetResponseStream())
-            {
-                StreamReader reader = new StreamReader(stream);
-                output = reader.ReadToEnd();
-            }
-
-            return output;
-        }
-
-        /// <summary>
-        /// Base async method for GET HTTP method to telegram bot API
-        /// </summary>
-        /// <param name="method"></param>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        public async Task<string> GetAsync(string method, Dictionary<string, string> param = null)
-        {
-            if (string.IsNullOrEmpty(method))
-            {
-                throw new ArgumentNullException("method empty or null.");
-            }
-
-            // Form request string
-            string url = ProcessGetArgs(method, param);
-
-            // Make request
-            WebRequest request = WebRequest.Create(url);
-
-            string output;
-
-            using (WebResponse response = await request.GetResponseAsync())
-            using (Stream stream = response.GetResponseStream())
-            {
-                StreamReader reader = new StreamReader(stream);
-                output = await reader.ReadToEndAsync();
-            }
-
-            return output;
-        }
-
-        /// <summary>
-        /// Implementation getMe GET method
-        /// see https://core.telegram.org/bots/api#getme
-        /// </summary>
-        /// <returns></returns>
-        public Response<User> getMe()
-        {
-            string methodName = Enum.GetName(typeof(Methods), Methods.getMe);
-
-            string result = Get(methodName);
-
-            Response<User> response = JsonConvert.DeserializeObject<Response<User>>(result);
-
-            return response;
-        }
-
-        /// <summary>
-        /// Implementation getMe GET method asynchronously
-        /// </summary>
-        /// <returns></returns>
-        public async Task<Response<User>> getMeAsync()
-        {
-            string methodName = Enum.GetName(typeof(Methods), Methods.getMe);
-
-            string result = await GetAsync(methodName);
-
-            Response<User> response = await Task<Response<User>>.Factory.StartNew(() =>
-                {
-                    return JsonConvert.DeserializeObject<Response<User>>(result);
-                });
-            return response;
-        }
-
-        /// <summary>
-        /// Read message from telegram API and deserialize result
-        /// use when set webhook
-        /// </summary>
-        /// <typeparam name="TOutput"></typeparam>
-        /// <param name="stream"></param>
-        /// <returns></returns>
-        public TOutput ReadMessage<TOutput>(Stream stream)
-        {
-            stream.Seek(0, System.IO.SeekOrigin.Begin);
+            stream.Seek(0, SeekOrigin.Begin);
             TOutput result;
             using (StreamReader reader = new StreamReader(stream))
             {
@@ -238,24 +61,145 @@ namespace TelegramBot.Core.Services.Implementations
         }
 
         /// <summary>
-        /// Read message from telegram API and deserialize result
-        /// use when set webhook
+        /// Read stream of request body from telegram API and deserialize result asynchronously
+        /// use when webhook is set
         /// </summary>
-        /// <typeparam name="TOutput"></typeparam>
-        /// <param name="stream"></param>
-        /// <returns></returns>
-        public async Task<TOutput> ReadMessageAsync<TOutput>(Stream stream)
+        /// <typeparam name="TOutput">Any type derived from BaseResponse</typeparam>
+        /// <param name="stream">Stream of request body</param>
+        /// <returns>BaseResponse derived type with filled properties from request body stream or null if stream can`t
+        /// be deserialize into object of parameter type</returns>
+        /// <exception>ArgumentNullException when stream is null and token in null or empty</exception>
+        public async Task<TOutput> ReadMessageAsync<TOutput>(Stream stream, string token) where TOutput : BaseResponse
         {
-            stream.Seek(0, System.IO.SeekOrigin.Begin);
-            string rawResult;
+            if (stream == null)
+            {
+                throw new ArgumentNullException("stream.");
+            }
+
+            if (string.IsNullOrEmpty(token))
+            {
+                throw new ArgumentNullException("token is empty or null.");
+            }
+
+            stream.Seek(0, SeekOrigin.Begin);
+            TOutput result;
             using (StreamReader reader = new StreamReader(stream))
             {
-                rawResult = await reader.ReadToEndAsync();
-            }
-            return await Task<TOutput>.Factory.StartNew(() =>
+                // string rawResult = reader.ReadToEnd();
+                string rawResult = await reader.ReadToEndAsync();
+                result = await Task<TOutput>.Factory.StartNew(() =>
                 {
                     return JsonConvert.DeserializeObject<TOutput>(rawResult);
                 });
+            }
+            return result;
         }
+
+        /// <summary>
+        /// Base method for POST HTTP method to telegram bot API
+        /// </summary>
+        /// <typeparam name="TOutput">Type derived from BaseResponse</typeparam>
+        /// <param name="botToken">Unique token of bot</param>
+        /// <param name="request">Request object, contains method name and request body</param>
+        /// <returns>Response object with deserialize response from telegram bot API</returns>
+        /// <exception>ArgumentNullException if botToke is null or empty or request is null</exception>
+        public Response<TOutput> Post<TOutput>(string botToken, Request request) where TOutput : BaseResponse
+        {
+            if (string.IsNullOrEmpty(botToken))
+            {
+                throw new ArgumentNullException("botToken empty or null.");
+            }
+            if (request == null)
+            {
+                throw new ArgumentNullException("request.");
+            }
+
+            string url = _url + botToken + "/" + ((dynamic)request).method;
+
+            // Make request
+            WebRequest webRequest = WebRequest.Create(url);
+            webRequest.ContentType = "application/json";
+            webRequest.Method = "POST";
+
+            string serializeRequestBody = JsonConvert.SerializeObject(request);
+
+            using (StreamWriter writer = new StreamWriter(webRequest.GetRequestStream()))
+            {
+                writer.Write(serializeRequestBody);
+                writer.Flush();
+                writer.Close();
+            }
+
+            string output;
+
+            Response<TOutput> result = null;
+            using (WebResponse response = webRequest.GetResponse())
+            using (Stream stream = response.GetResponseStream())
+            using (StreamReader reader = new StreamReader(stream))
+            {             
+                output = reader.ReadToEnd();
+                result = JsonConvert.DeserializeObject<Response<TOutput>>(output);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Base method for POST HTTP method to telegram bot API asynchronously
+        /// </summary>
+        /// <typeparam name="TOutput">Type derived from BaseResponse</typeparam>
+        /// <param name="botToken">Unique token of bot</param>
+        /// <param name="request">Request object, contains method name and request body</param>
+        /// <returns>Response object with deserialize response from telegram bot API</returns>
+        /// <exception>ArgumentNullException if botToke is null or empty or request is null</exception>
+        public async Task<Response<TOutput>> PostAsync<TOutput>(string botToken, Request request) where TOutput : BaseResponse
+        {
+            if (string.IsNullOrEmpty(botToken))
+            {
+                throw new ArgumentNullException("botToken empty or null.");
+            }
+            if (request == null)
+            {
+                throw new ArgumentNullException("request.");
+            }
+
+            string url = _url + botToken + "/" + ((dynamic)request).method;
+
+            // Make request
+            WebRequest webRequest = WebRequest.Create(url);
+            webRequest.ContentType = "application/json";
+            webRequest.Method = "POST";
+
+            string serializeRequestBody = await Task.Factory.StartNew(() =>
+            {
+                return JsonConvert.SerializeObject(request);
+            });
+
+            using (Stream stream = await webRequest.GetRequestStreamAsync())
+            using (StreamWriter writer = new StreamWriter(stream))
+            {
+                await writer.WriteAsync(serializeRequestBody);
+                await writer.FlushAsync();
+                writer.Close();
+            }
+
+            string output;
+
+            Response<TOutput> result = null;
+            using (WebResponse response = await webRequest.GetResponseAsync())
+            using (Stream stream = response.GetResponseStream())
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                output = await reader.ReadToEndAsync();
+                result = await Task<Response<TOutput>>.Factory.StartNew(() =>
+                    {
+                        return JsonConvert.DeserializeObject<Response<TOutput>>(output);
+                    });
+            }
+
+            return result;
+        }
+
+        #endregion Methods
     }
 }

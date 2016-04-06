@@ -1,12 +1,14 @@
-﻿namespace TelegramBot.Core.Types.ReturnTypes
+﻿using System;
+
+namespace TelegramBot.Core.Types.ResponseTypes
 {
     /// <summary>
     /// Represents User type
     /// see: https://core.telegram.org/bots/api#user
     /// </summary>
-    public class User : BaseReturnType
+    public class UserResponse : BaseResponse
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
 
         public string First_Name { get; set; }
 

@@ -30,8 +30,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -46,21 +46,22 @@
   <ItemGroup>
     <Compile Include="Core\Services\Implementations\BaseBotService.cs" />
     <Compile Include="Core\Services\Contracts\IBaseBotService.cs" />
-    <Compile Include="Core\Types\MethodParamTypes\BaseMethodParamType.cs" />
-    <Compile Include="Core\Types\MethodParamTypes\BaseReplyType.cs" />
-    <Compile Include="Core\Types\MethodParamTypes\ForceReply.cs" />
-    <Compile Include="Core\Types\MethodParamTypes\SendMessage.cs" />
-    <Compile Include="Core\Types\MethodParamTypes\Methods.cs" />
-    <Compile Include="Core\Types\MethodParamTypes\ReplyKeyboardHide.cs" />
-    <Compile Include="Core\Types\MethodParamTypes\ReplyKeyboardMarkup.cs" />
-    <Compile Include="Core\Types\ReturnTypes\BaseReturnType.cs" />
+    <Compile Include="Core\Types\RequestTypes\BaseRequest.cs" />
+    <Compile Include="Core\Types\RequestTypes\BaseReplyRequest.cs" />
+    <Compile Include="Core\Types\RequestTypes\ParseModes.cs" />
+    <Compile Include="Core\Types\ResponseTypes\BaseResponse.cs" />
+    <Compile Include="Core\Types\RequestTypes\ForceReplyRequest.cs" />
+    <Compile Include="Core\Types\RequestTypes\Request.cs" />
+    <Compile Include="Core\Types\ResponseTypes\ChatResponse.cs" />
+    <Compile Include="Core\Types\ResponseTypes\MessageResponse.cs" />
+    <Compile Include="Core\Types\ResponseTypes\Response.cs" />
+    <Compile Include="Core\Types\RequestTypes\SendMessageRequest.cs" />
+    <Compile Include="Core\Types\RequestTypes\Methods.cs" />
+    <Compile Include="Core\Types\RequestTypes\ReplyKeyboardHideRequest.cs" />
+    <Compile Include="Core\Types\RequestTypes\ReplyKeyboardMarkupRequest.cs" />
+    <Compile Include="Core\Types\ResponseTypes\UpdateResponse.cs" />
+    <Compile Include="Core\Types\ResponseTypes\UserResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Core\Types\ReturnTypes\Chat.cs" />
-    <Compile Include="Core\Types\ReturnTypes\Message.cs" />
-    <Compile Include="Core\Types\ReturnTypes\Response.cs" />
-    <Compile Include="Core\Types\ReturnTypes\Update.cs" />
-    <Compile Include="Core\Types\ReturnTypes\User.cs" />
-    <Compile Include="Core\Types\MethodParamTypes\WebhookPayload.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

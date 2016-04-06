@@ -3,25 +3,19 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.IO;
 
-using TelegramBot.Core.Types.ReturnTypes;
-using TelegramBot.Core.Types.MethodParamTypes;
+using TelegramBot.Core.Types.RequestTypes;
+using TelegramBot.Core.Types.ResponseTypes;
 
 namespace TelegramBot.Core.Services.Contracts
 {
     public interface IBaseBotService
     {
-        string Token { get; }
+        TOutput ReadMessage<TOutput>(Stream stream, string token) where TOutput : BaseResponse;
 
-        string Get(string method, Dictionary<string, string> param = null);
+        Task<TOutput> ReadMessageAsync<TOutput>(Stream stream, string token) where TOutput : BaseResponse;
 
-        Task<string> GetAsync(string method, Dictionary<string, string> param = null);
+        Response<TOutput> Post<TOutput>(string botToken, Request request) where TOutput : BaseResponse;
 
-        Response<User> getMe();
-
-        Task<Response<User>> getMeAsync();
-
-        TOutput ReadMessage<TOutput>(Stream stream);
-
-        Task<TOutput> ReadMessageAsync<TOutput>(Stream stream);
+        Task<Response<TOutput>> PostAsync<TOutput>(string botToken, Request request) where TOutput : BaseResponse;
     }
 }
