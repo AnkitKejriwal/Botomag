@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data.Entity;
 using Botomag.DAL.Model;
+using Botomag.DAL.Model.Configurations;
 
 namespace Botomag.DAL
 {
@@ -9,25 +10,27 @@ namespace Botomag.DAL
     /// </summary>
     public class Context :  DbContext
     {
-        public Context() : base("Name=FightBetBotConnectionString") { }
-
-        public DbSet<BetType> BetTypes { get; set; }
+        public Context() : base("Name=Botomag") { }
 
         public DbSet<Bot> Bots { get; set;}
 
-        public DbSet<Fight> Fights { get; set; }
+        public DbSet<Command> Commands { get; set; }
 
-        public DbSet<Organization> Organizations { get; set; }
+        public DbSet<Response> Responses { get; set; }
+
+        public DbSet<LastUpdate> LastUpdates { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Configurations.Add(new BetTypeConfiguration());
             modelBuilder.Configurations.Add(new BotConfiguration());
-            modelBuilder.Configurations.Add(new FightConfiguration());
-            modelBuilder.Configurations.Add(new OrganizationConfiguration());
 
+            modelBuilder.Configurations.Add(new CommandConfiguration());
+
+            modelBuilder.Configurations.Add(new ResponseConfiguration());
+
+            modelBuilder.Configurations.Add(new LastUpdateConfiguration());
         }
     }
 }

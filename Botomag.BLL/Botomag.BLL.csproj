@@ -45,22 +45,23 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Contracts\IBaseService.cs" />
+    <Compile Include="Contracts\IBotService.cs" />
     <Compile Include="Contracts\IMailService.cs" />
-    <Compile Include="Contracts\ISplitDecisionBotService.cs" />
     <Compile Include="Implementations\BaseService.cs" />
+    <Compile Include="Implementations\BotService.cs" />
     <Compile Include="Implementations\MailService.cs" />
-    <Compile Include="Implementations\SplitDecisionBotService.cs" />
     <Compile Include="Infrastructure\AutomapperConfig.cs" />
     <Compile Include="Model\BaseModel.cs" />
-    <Compile Include="Model\BetTypeModel.cs" />
-    <Compile Include="Model\FightModel.cs" />
-    <Compile Include="Model\OrganizationModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Botomag.DAL\Botomag.DAL.csproj">
       <Project>{d4979a7d-6b67-4f15-8439-0b5e4c5187e0}</Project>
       <Name>Botomag.DAL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TelegramBot\TelegramBot.csproj">
+      <Project>{eb1ac8b3-5b00-4850-a417-3cfac292b4c8}</Project>
+      <Name>TelegramBot</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

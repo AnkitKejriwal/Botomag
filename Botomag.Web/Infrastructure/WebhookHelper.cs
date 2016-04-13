@@ -20,7 +20,7 @@ namespace Botomag.Web.Infrastructure
         public static object ProcessMessage(
             Update update, 
             HttpApplicationStateBase applicationState, 
-            IBaseBotService botService,
+            ITelegramBotService botService,
             ISplitDecisionBotService fightService)
         {
             if (update == null)
@@ -111,7 +111,7 @@ namespace Botomag.Web.Infrastructure
         public static async Task<object> ProcessMessageAsync(
             Update update,
             HttpApplicationStateBase applicationState,
-            IBaseBotService botService,
+            ITelegramBotService botService,
             ISplitDecisionBotService fightService)
         {
             if (update == null)

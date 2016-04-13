@@ -10,11 +10,7 @@ namespace Botomag.BLL.Infrastructure
     {
         public static void Configuration(IMapperConfiguration config)
         {
-            config.CreateMap<BetType, BetTypeModel>();
 
-            config.CreateMap<Organization, OrganizationModel>();
-
-            config.CreateMap<Fight, FightModel>();
         }
     }
 }

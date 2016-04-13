@@ -5,6 +5,7 @@ namespace Botomag.DAL.Migrations
     using System.Data.Entity.Migrations;
     using System.Linq;
     using Botomag.DAL.Model;
+    using System.Collections.Generic;
 
     public sealed class Configuration : DbMigrationsConfiguration<Context>
     {
@@ -27,58 +28,31 @@ namespace Botomag.DAL.Migrations
             //      new Person { FullName = "Rowan Miller" }
             //    );
             //
-
-            if (context.BetTypes.Count() == 0)
+            //create entries for test bot
+            Bot testBot = context.Bots.Where(n => n.Token == "219824686:AAFkrCCS1yRhdjKBfUrNbd6VlzNiDChHOMc").FirstOrDefault();
+            if (testBot == null)
             {
-                context.BetTypes.AddRange(
-                    new BetType[]
-                    {
-                        new BetType { Id = Guid.NewGuid(), Title = "Ординар" },
-                        new BetType { Id = Guid.NewGuid(), Title = "Экспресс" },
-                        new BetType { Id = Guid.NewGuid(), Title = "Система" },
-                        new BetType { Id = Guid.NewGuid(), Title = "Регуляр" }
-                    });
-            }
-
-            if (context.Organizations.Count() == 0)
-            {
-                context.Organizations.AddRange(
-                    new Organization[]
-                    {
-                        new Organization { Id = Guid.NewGuid(), Title = "UFC" },
-                        new Organization { Id = Guid.NewGuid(), Title = "Bellator" },
-                        new Organization { Id = Guid.NewGuid(), Title = "WSOF" },
-                        new Organization { Id = Guid.NewGuid(), Title = "ONE" },
-                        new Organization { Id = Guid.NewGuid(), Title = "InvictaFC" },
-                    });
-            }
-
-            context.SaveChanges();
-
-            if (context.Fights.Count() == 0)
-            {
-                context.Fights.AddRange(
-                    new Fight[]
+                testBot = new Bot
                 {
-                    new Fight
-                    {
-                        Id = Guid.NewGuid(),
-                        Bet = "Роджерс-Паттисон П1",
-                        BetType = context.BetTypes.Where(n => n.Title == "Система").Single(),
-                        Date = DateTime.Now + TimeSpan.FromDays(10),
-                        Factor = 2.00M,
-                        Organization = context.Organizations.Where(n => n.Title == "UFC").Single()
-                    },
-                    new Fight
-                    {
-                        Id = Guid.NewGuid(),
-                        Bet = "Джейсон-Марков ТБ 2",
-                        BetType = context.BetTypes.Where(n => n.Title == "Система").Single(),
-                        Date = DateTime.Now + TimeSpan.FromDays(10),
-                        Factor = 2.15M,
-                        Organization = context.Organizations.Where(n => n.Title == "UFC").Single()
+                    Id = Guid.NewGuid(),
+                    Token = "219824686:AAFkrCCS1yRhdjKBfUrNbd6VlzNiDChHOMc",
+                };
+                Response response = new Response { Id = Guid.NewGuid(), Text = "Success!" };
+                testBot.Commands = new HashSet<Command>
+                {
+                    new Command { 
+                        BotId = testBot.Id, 
+                        CommandType = CommandTypes.Literal, 
+                        CurrentState = 0, 
+                        Name = "/test", 
+                        Response = response,
+                        ResponseId = response.Id,
+                        NextState = 0, 
+                        Id = Guid.NewGuid() 
                     }
-                });
+                };
+                context.Bots.Add(testBot);
+                context.SaveChanges();
             }
         }
     }

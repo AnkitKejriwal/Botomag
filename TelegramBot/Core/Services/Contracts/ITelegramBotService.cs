@@ -8,7 +8,7 @@ using TelegramBot.Core.Types.ResponseTypes;
 
 namespace TelegramBot.Core.Services.Contracts
 {
-    public interface IBaseBotService
+    public interface ITelegramBotService
     {
         TOutput ReadMessage<TOutput>(Stream stream, string token) where TOutput : BaseResponse;
 

@@ -96,6 +96,9 @@ namespace TelegramBot.Core.Types.RequestTypes
                 case "SendMessageRequest":
                     _params.Add("method", Enum.GetName(typeof(Methods), Methods.sendMessage));
                     break;
+                case "GetMeRequest":
+                    _params.Add("method", Enum.GetName(typeof(Methods), Methods.getMe));
+                    break;
             }
             PropertyInfo[] properties = runtimeType.GetProperties();
             Assembly executingAssembly = Assembly.GetExecutingAssembly();

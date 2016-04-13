@@ -50,42 +50,37 @@
   <ItemGroup>
     <Compile Include="Context.cs" />
     <Compile Include="IUnitOfWork.cs" />
-    <Compile Include="Migrations\201602081702454_initial.cs" />
-    <Compile Include="Migrations\201602081702454_initial.Designer.cs">
-      <DependentUpon>201602081702454_initial.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201602161638108_addTokenRemoveNameFromBot.cs" />
-    <Compile Include="Migrations\201602161638108_addTokenRemoveNameFromBot.Designer.cs">
-      <DependentUpon>201602161638108_addTokenRemoveNameFromBot.cs</DependentUpon>
+    <Compile Include="Migrations\201604131646406_FirstMigration.cs" />
+    <Compile Include="Migrations\201604131646406_FirstMigration.Designer.cs">
+      <DependentUpon>201604131646406_FirstMigration.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Model\BaseEntity.cs" />
-    <Compile Include="Model\BetType.cs" />
     <Compile Include="Model\Bot.cs" />
+    <Compile Include="Model\Command.cs" />
+    <Compile Include="Model\CommandTypes.cs" />
     <Compile Include="Model\Configurations\BaseConfiguration.cs" />
-    <Compile Include="Model\Configurations\BetTypeConfiguration.cs" />
     <Compile Include="Model\Configurations\BotConfiguration.cs" />
-    <Compile Include="Model\Configurations\FightConfiguration.cs" />
-    <Compile Include="Model\Configurations\OrganizationConfiguration.cs" />
-    <Compile Include="Model\Fight.cs" />
+    <Compile Include="Model\Configurations\CommandConfiguration.cs" />
+    <Compile Include="Model\Configurations\LastUpdateConfiguration.cs" />
+    <Compile Include="Model\Configurations\ResponseConfiguration.cs" />
     <Compile Include="Model\IBaseEntity.cs" />
-    <Compile Include="Model\Organization.cs" />
+    <Compile Include="Model\LastUpdate.cs" />
+    <Compile Include="Model\ParseModes.cs" />
+    <Compile Include="Model\Response.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="IRepository.cs" />
     <Compile Include="Repository.cs" />
     <Compile Include="UnitOfWork.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201602081702454_initial.resx">
-      <DependentUpon>201602081702454_initial.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201602161638108_addTokenRemoveNameFromBot.resx">
-      <DependentUpon>201602161638108_addTokenRemoveNameFromBot.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201604131646406_FirstMigration.resx">
+      <DependentUpon>201604131646406_FirstMigration.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

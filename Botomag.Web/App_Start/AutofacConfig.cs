@@ -22,16 +22,12 @@ namespace Botomag.Web
             builder.RegisterControllers(typeof(MvcApplication).Assembly);
 
             // Register services
-            string botToken = AppConfigHelper.GetValue<string>(AppConfigKeys.BotToken, n => n);
-            BaseBotService botsrv = new BaseBotService(botToken);
-            builder.RegisterInstance(botsrv).As<IBaseBotService>();
-
             UnitOfWork unitOfWork = new UnitOfWork();
             builder.RegisterInstance(unitOfWork).As<IUnitOfWork>();
 
-            builder.RegisterType<SplitDecisionBotService>().As<ISplitDecisionBotService>();
-
+            builder.RegisterType<BotService>().As<IBotService>();
             builder.RegisterType<MailService>().As<IMailService>();
+            builder.RegisterType<TelegramBotService>().As<ITelegramBotService>();
 
             MapperConfiguration config = new MapperConfiguration(cfg => Botomag.BLL.Infrastructure.AutomapperConfig.Configuration(cfg));
             config.AssertConfigurationIsValid();

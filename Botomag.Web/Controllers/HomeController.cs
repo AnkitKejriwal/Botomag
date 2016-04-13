@@ -7,10 +7,7 @@ using System.Threading.Tasks;
 using System.Text;
 
 using Botomag.BLL.Contracts;
-using Botomag.BLL.Model;
 using Botomag.Web.Infrastructure;
-using TelegramBot.Core.Services.Contracts;
-using TelegramBot.Core.Types.ReturnTypes;
 
 namespace Botomag.Web.Controllers
 {
@@ -20,21 +17,18 @@ namespace Botomag.Web.Controllers
 
         #region Properties and Fields
 
-        IBaseBotService _botService;
-        ISplitDecisionBotService _splitDecisionService;
         IMailService _mailService;
+        IBotService _botService;
 
         #endregion Properties and Fields
 
         #region Constructors
 
         public HomeController(
-            IBaseBotService botService, 
-            ISplitDecisionBotService splitDecisionService, 
+            IBotService botService, 
             IMailService mailService)
         {
             _botService = botService;
-            _splitDecisionService = splitDecisionService;
             _mailService = mailService;
         }
 
@@ -50,28 +44,17 @@ namespace Botomag.Web.Controllers
         /// <summary>
         /// Processing updates from telegram bot API webhook
         /// </summary>
-        /// <param name="id">Id is token which was set when setup webhook</param>
+        /// <param name="id">Id is token which was set when setup webhook
+        /// it identifies appropriate bot</param>
         /// <returns>Json result with message response</returns>
-        //[RequireHttps]
+        [RequireHttps]
         [HttpPost]
-        public async Task<ActionResult> PostMessages(Guid? id = null)
+        public ActionResult PostMessage(string id = null)
         {
-            if (id.HasValue)
+            if (!string.IsNullOrEmpty(id))
             {
-                Guid telegramPostToken = await CacheHelper.GetOrSetAsync<Guid>(
-                    CacheKeys.TelegramPostToken,
-                    HttpContext.Application,
-                    () => AppConfigHelper.GetValue<Guid>(AppConfigKeys.TelegramPostToken, str => Guid.Parse(str)));
-
-                if (id == telegramPostToken)
-                {
-                    Update update = await _botService.ReadMessageAsync<Update>(Request.InputStream);
-                    object result = await WebhookHelper.ProcessMessageAsync(update, HttpContext.Application, _botService, _splitDecisionService);
-                    if (result != null)
-                    {
-                        return new JsonResult { Data = result };
-                    }
-                }
+                object result = _botService.ProcessUpdate(id, Request.InputStream);
+                return new JsonResult { Data = result };
             }
 
             return null;

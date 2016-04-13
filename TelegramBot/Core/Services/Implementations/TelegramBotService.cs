@@ -6,8 +6,6 @@ using System.Threading.Tasks;
 using System.Net;
 using System.IO;
 using Newtonsoft.Json;
-using System.Reflection;
-using System.ComponentModel.DataAnnotations;
 
 using TelegramBot.Core.Services.Contracts;
 using TelegramBot.Core.Types.ResponseTypes;
@@ -18,7 +16,7 @@ namespace TelegramBot.Core.Services.Implementations
     /// <summary>
     /// Base implementation of Telegram Bot API Service
     /// </summary>
-    public class BaseBotService : IBaseBotService
+    public class TelegramBotService : ITelegramBotService
     {
 
         #region Properties

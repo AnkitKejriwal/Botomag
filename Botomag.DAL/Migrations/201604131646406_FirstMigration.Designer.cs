@@ -7,13 +7,13 @@ namespace Botomag.DAL.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class addTokenRemoveNameFromBot : IMigrationMetadata
+    public sealed partial class FirstMigration : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(addTokenRemoveNameFromBot));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(FirstMigration));
         
         string IMigrationMetadata.Id
         {
-            get { return "201602161638108_addTokenRemoveNameFromBot"; }
+            get { return "201604131646406_FirstMigration"; }
         }
         
         string IMigrationMetadata.Source

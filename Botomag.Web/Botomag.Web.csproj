@@ -159,7 +159,6 @@
     <Compile Include="Infrastructure\AppConfigHelper.cs" />
     <Compile Include="Infrastructure\CacheHelper.cs" />
     <Compile Include="Infrastructure\UrlHelperExtensions.cs" />
-    <Compile Include="Infrastructure\WebhookHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

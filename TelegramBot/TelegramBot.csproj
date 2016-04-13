@@ -44,10 +44,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\Services\Implementations\BaseBotService.cs" />
-    <Compile Include="Core\Services\Contracts\IBaseBotService.cs" />
+    <Compile Include="Core\Services\Implementations\TelegramBotService.cs" />
+    <Compile Include="Core\Services\Contracts\ITelegramBotService.cs" />
     <Compile Include="Core\Types\RequestTypes\BaseRequest.cs" />
     <Compile Include="Core\Types\RequestTypes\BaseReplyRequest.cs" />
+    <Compile Include="Core\Types\RequestTypes\GetMeRequest.cs" />
     <Compile Include="Core\Types\RequestTypes\ParseModes.cs" />
     <Compile Include="Core\Types\ResponseTypes\BaseResponse.cs" />
     <Compile Include="Core\Types\RequestTypes\ForceReplyRequest.cs" />
