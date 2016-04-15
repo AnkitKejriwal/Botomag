@@ -14,23 +14,32 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		LocalIISDebug|Any CPU = LocalIISDebug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{EB1AC8B3-5B00-4850-A417-3CFAC292B4C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EB1AC8B3-5B00-4850-A417-3CFAC292B4C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB1AC8B3-5B00-4850-A417-3CFAC292B4C8}.LocalIISDebug|Any CPU.ActiveCfg = LocalIISDebug|Any CPU
+		{EB1AC8B3-5B00-4850-A417-3CFAC292B4C8}.LocalIISDebug|Any CPU.Build.0 = LocalIISDebug|Any CPU
 		{EB1AC8B3-5B00-4850-A417-3CFAC292B4C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EB1AC8B3-5B00-4850-A417-3CFAC292B4C8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D4979A7D-6B67-4F15-8439-0B5E4C5187E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D4979A7D-6B67-4F15-8439-0B5E4C5187E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4979A7D-6B67-4F15-8439-0B5E4C5187E0}.LocalIISDebug|Any CPU.ActiveCfg = LocalIISDebug|Any CPU
+		{D4979A7D-6B67-4F15-8439-0B5E4C5187E0}.LocalIISDebug|Any CPU.Build.0 = LocalIISDebug|Any CPU
 		{D4979A7D-6B67-4F15-8439-0B5E4C5187E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4979A7D-6B67-4F15-8439-0B5E4C5187E0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{04B847B6-4D53-4F7B-917C-354493579B50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{04B847B6-4D53-4F7B-917C-354493579B50}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04B847B6-4D53-4F7B-917C-354493579B50}.LocalIISDebug|Any CPU.ActiveCfg = LocalIISDebug|Any CPU
+		{04B847B6-4D53-4F7B-917C-354493579B50}.LocalIISDebug|Any CPU.Build.0 = LocalIISDebug|Any CPU
 		{04B847B6-4D53-4F7B-917C-354493579B50}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{04B847B6-4D53-4F7B-917C-354493579B50}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E1C4071C-5BBB-4637-914C-5908788F461F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E1C4071C-5BBB-4637-914C-5908788F461F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1C4071C-5BBB-4637-914C-5908788F461F}.LocalIISDebug|Any CPU.ActiveCfg = LocalIISDebug|Any CPU
+		{E1C4071C-5BBB-4637-914C-5908788F461F}.LocalIISDebug|Any CPU.Build.0 = LocalIISDebug|Any CPU
 		{E1C4071C-5BBB-4637-914C-5908788F461F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E1C4071C-5BBB-4637-914C-5908788F461F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection

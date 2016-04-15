@@ -36,16 +36,11 @@ namespace TelegramBot.Core.Services.Implementations
         /// <returns>BaseResponse derived type with filled properties from request body stream or null if stream can`t
         /// be deserialize into object of parameter type</returns>
         /// <exception>ArgumentNullException when stream is null and token in null or empty</exception>
-        public TOutput ReadMessage<TOutput>(Stream stream, string token) where TOutput : BaseResponse
+        public TOutput ReadMessage<TOutput>(Stream stream) where TOutput : BaseResponse
         {
             if (stream == null)
             {
                 throw new ArgumentNullException("stream.");
-            }
-
-            if (string.IsNullOrEmpty(token))
-            {
-                throw new ArgumentNullException("token is empty or null.");
             }
 
             stream.Seek(0, SeekOrigin.Begin);
@@ -67,16 +62,11 @@ namespace TelegramBot.Core.Services.Implementations
         /// <returns>BaseResponse derived type with filled properties from request body stream or null if stream can`t
         /// be deserialize into object of parameter type</returns>
         /// <exception>ArgumentNullException when stream is null and token in null or empty</exception>
-        public async Task<TOutput> ReadMessageAsync<TOutput>(Stream stream, string token) where TOutput : BaseResponse
+        public async Task<TOutput> ReadMessageAsync<TOutput>(Stream stream) where TOutput : BaseResponse
         {
             if (stream == null)
             {
                 throw new ArgumentNullException("stream.");
-            }
-
-            if (string.IsNullOrEmpty(token))
-            {
-                throw new ArgumentNullException("token is empty or null.");
             }
 
             stream.Seek(0, SeekOrigin.Begin);
@@ -196,6 +186,11 @@ namespace TelegramBot.Core.Services.Implementations
             }
 
             return result;
+        }
+
+        public string SerializeRequest(Request request)
+        {
+            return JsonConvert.SerializeObject(request);
         }
 
         #endregion Methods

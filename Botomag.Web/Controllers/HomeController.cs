@@ -47,13 +47,13 @@ namespace Botomag.Web.Controllers
         /// <param name="id">Id is token which was set when setup webhook
         /// it identifies appropriate bot</param>
         /// <returns>Json result with message response</returns>
-        [RequireHttps]
+        //[RequireHttps]
         [HttpPost]
-        public ActionResult PostMessage(string id = null)
+        public ActionResult PostMessage(Guid? id = null)
         {
-            if (!string.IsNullOrEmpty(id))
+            if (id.HasValue)
             {
-                object result = _botService.ProcessUpdate(id, Request.InputStream);
+                object result = _botService.ProcessUpdate(id.Value, Request.InputStream);
                 return new JsonResult { Data = result };
             }
 

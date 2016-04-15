@@ -44,28 +44,23 @@ namespace Botomag.BLL.Implementations
         /// <param name="token">Unique bot token</param>
         /// <param name="stream">Stream of webhook request</param>
         /// <returns>Object for response</returns>
-        public object ProcessUpdate(string token, Stream stream)
+        public object ProcessUpdate(Guid botId, Stream stream)
         {
-            if (token == null)
-            {
-                throw new ArgumentNullException("token.");
-            }
-
             if (stream == null)
             {
                 throw new ArgumentNullException("stream.");
             }
 
             IRepository<Bot, Guid> botRepo = _unitOfWork.GetRepository<Bot, Guid>();
-            Bot bot = botRepo.Get(n => n.Token == token).FirstOrDefault();
+            Bot bot = botRepo.Get(n => n.Id == botId).FirstOrDefault();
 
             if (bot == null)
             {
-                throw new InvalidOperationException(string.Format("bot with token {0} doesn`t exist.", token));
+                throw new InvalidOperationException(string.Format("bot with id {0} doesn`t exist.", botId));
             }
 
             // Take update object
-            UpdateResponse response = _telegramBotService.ReadMessage<UpdateResponse>(stream, token);
+            UpdateResponse response = _telegramBotService.ReadMessage<UpdateResponse>(stream);
 
             // Search last update with such chat_id in response
             LastUpdate lastUpdate = bot.LastUpates.Where(n => n.ChatId == response.Message.Chat.Id).FirstOrDefault();
@@ -77,7 +72,7 @@ namespace Botomag.BLL.Implementations
             if (lastUpdate == null)
             {
                 // There is no conversation for this chat
-                // so we search command with current state = 0 - initial state
+                // so we search command with current state = initial state
                 commands = bot.Commands.Where(n => n.CurrentState == expectedState).ToList();
             }
             else
@@ -107,7 +102,7 @@ namespace Botomag.BLL.Implementations
             if (commands.Count == 0)
             {
                 // there is no at least one command with such state
-                throw new InvalidOperationException(string.Format("bot with token {0} has no at least one command with expected state {1}.", token, expectedState));
+                throw new InvalidOperationException(string.Format("bot with id {0} has no at least one command with expected state {1}.", botId, expectedState));
             }
 
             // now try parse request and get appropriate response to user
@@ -125,8 +120,13 @@ namespace Botomag.BLL.Implementations
                 }
 
                 // get bot name
-                Response<UserResponse> botInfo = _telegramBotService.Post<UserResponse>(token, new Request(new GetMeRequest()));
-                Regex botNameRegEx = new Regex(@"^@" + botInfo + @"$");
+                Response<UserResponse> botInfo = _telegramBotService.Post<UserResponse>(bot.Token, new Request(new GetMeRequest()));
+                if (botInfo.Ok == false)
+                {
+                    throw new InvalidOperationException(string.Format("it seems that bot with id {0} has invalid token {1}", botId, bot.Token));
+                }
+
+                Regex botNameRegEx = new Regex(@"^@" + botInfo.Result.UserName + @"$");
 
                 //if first word is the name of bot, just delete it
                 if (botNameRegEx.IsMatch(wordsList[0]))
@@ -180,12 +180,12 @@ namespace Botomag.BLL.Implementations
             if (matchCommandList.Count > 1)
             {
                 throw new InvalidOperationException(
-                    string.Format("there is ambiguity between commands: {0} of bot with token: {1}",
-                    string.Join(", ", matchCommandList.Select(n => n.Name), token)));
+                    string.Format("there is ambiguity between commands {0} of bot with id {1}",
+                    string.Join(", ", matchCommandList.Select(n => n.Name), botId)));
             }
 
             //ok, at this point we have single match!
-            // at this point update or create LastUpdate object
+            //at this point update or create LastUpdate object
             Command matchCommand = matchCommandList.First();
             if (lastUpdate == null)
             {
@@ -207,11 +207,13 @@ namespace Botomag.BLL.Implementations
             _unitOfWork.Save();
 
             //and return response to user!
-            return new Request(new SendMessageRequest
+            Request request = new Request(new SendMessageRequest
                 {
                     Chat_Id = response.Message.Chat.Id,
                     Text = matchCommand.Response.Text
                 });
+
+            return _telegramBotService.SerializeRequest(request);
         }
 
         #endregion Methods

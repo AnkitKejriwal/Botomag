@@ -29,13 +29,15 @@ namespace Botomag.DAL.Migrations
             //    );
             //
             //create entries for test bot
-            Bot testBot = context.Bots.Where(n => n.Token == "219824686:AAFkrCCS1yRhdjKBfUrNbd6VlzNiDChHOMc").FirstOrDefault();
+            Guid testBotId = new Guid("9EFD5204-F97A-4AC2-8163-7EFF4B73E2F2");
+            string testBotToken = "219824686:AAFkrCCS1yRhdjKBfUrNbd6VlzNiDChHOMc";
+            Bot testBot = context.Bots.Where(n => n.Id == testBotId).FirstOrDefault();
             if (testBot == null)
             {
                 testBot = new Bot
                 {
-                    Id = Guid.NewGuid(),
-                    Token = "219824686:AAFkrCCS1yRhdjKBfUrNbd6VlzNiDChHOMc",
+                    Id = testBotId,
+                    Token = testBotToken,
                 };
                 Response response = new Response { Id = Guid.NewGuid(), Text = "Success!" };
                 testBot.Commands = new HashSet<Command>
