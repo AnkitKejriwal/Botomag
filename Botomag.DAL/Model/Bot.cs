@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Botomag.DAL.Model
 {
     /// <summary>
-    /// Represent bot through its token
+    /// Represent bot
     /// </summary>
     public class Bot : BaseEntity<Guid>
     {
@@ -12,6 +12,10 @@ namespace Botomag.DAL.Model
 
         public virtual ICollection<Command> Commands { get; set; }
 
-        public virtual ICollection<LastUpdate> LastUpates { get; set; }
+        public virtual ICollection<LastUpdate> LastUpdates { get; set; }
+
+        public virtual BotStat BotStat { get; set; }
+
+        public virtual Response InvalidCommandResponse { get; set; }
     }
 }

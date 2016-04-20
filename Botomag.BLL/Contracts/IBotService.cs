@@ -5,6 +5,6 @@ namespace Botomag.BLL.Contracts
 {
     public interface IBotService
     {
-        object ProcessUpdate(Guid botId, Stream stream);
+        string ProcessUpdate(Guid botId, Stream stream);
     }
 }

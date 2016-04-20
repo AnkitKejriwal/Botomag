@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Botomag.DAL.Model
 {
+    /// <summary>
+    /// Represent command of bot
+    /// </summary>
     public class Command : BaseEntity<Guid>
     {
         public Guid BotId { get; set; }
@@ -10,16 +14,12 @@ namespace Botomag.DAL.Model
 
         public string Name { get; set; }
 
-        public CommandTypes CommandType { get; set; }
-
         public int CurrentState { get; set; }
 
         public int NextState { get; set; }
 
-        public Guid ResponseId { get; set; }
+        public virtual ICollection<Parameter> Parameters { get; set; }
 
-        public virtual Response Response { get; set; }
-
-
+        public virtual Response InvalidParameterResponse { get; set; }
     }
 }

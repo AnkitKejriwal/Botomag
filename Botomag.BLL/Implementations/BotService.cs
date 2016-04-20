@@ -44,7 +44,7 @@ namespace Botomag.BLL.Implementations
         /// <param name="token">Unique bot token</param>
         /// <param name="stream">Stream of webhook request</param>
         /// <returns>Object for response</returns>
-        public object ProcessUpdate(Guid botId, Stream stream)
+        public string ProcessUpdate(Guid botId, Stream stream)
         {
             if (stream == null)
             {
@@ -60,10 +60,10 @@ namespace Botomag.BLL.Implementations
             }
 
             // Take update object
-            UpdateResponse response = _telegramBotService.ReadMessage<UpdateResponse>(stream);
+            UpdateResponse update = _telegramBotService.ReadMessage<UpdateResponse>(stream);
 
             // Search last update with such chat_id in response
-            LastUpdate lastUpdate = bot.LastUpates.Where(n => n.ChatId == response.Message.Chat.Id).FirstOrDefault();
+            LastUpdate lastUpdate = bot.LastUpdates.Where(n => n.ChatId == update.Message.Chat.Id).FirstOrDefault();
 
             List<Command> commands = new List<Command>();
 
@@ -80,13 +80,13 @@ namespace Botomag.BLL.Implementations
 
                 //we have conversation with this user 
                 //check if there is repeat
-                if (lastUpdate.UpdateId == response.Update_Id)
+                if (lastUpdate.UpdateId == update.Update_Id)
                 {
                     return null;
                 }
 
                 //check if there is continuation of last conversation
-                if (lastUpdate.UpdateId == response.Update_Id - 1)
+                if (lastUpdate.UpdateId == update.Update_Id - 1)
                 {
                     //there is the same conversation, continue
                     expectedState = lastUpdate.CurrentState;
@@ -108,7 +108,7 @@ namespace Botomag.BLL.Implementations
             // now try parse request and get appropriate response to user
             string splitRegExStr = @"[^\s]+";
             Regex splitRegEx = new Regex(splitRegExStr);
-            MatchCollection words = splitRegEx.Matches(response.Message.Text);
+            MatchCollection words = splitRegEx.Matches(update.Message.Text);
 
             // check if there at least one word
             List<string> wordsList = new List<string>();
@@ -140,77 +140,112 @@ namespace Botomag.BLL.Implementations
                 }
             }
 
-            // normalize input
-            string normalizeInput = string.Join(" ", wordsList);
-
             // search match command
-            List<Command> matchCommandList = new List<Command>();
+            Command matchCommand = null;
 
             foreach(Command command in commands)
             {
-                if (command.CommandType == CommandTypes.Literal)
+                // command must interpretate as literal object
+                if (command.Name == wordsList[0])
                 {
-                    // command must interpretate as literal object
-                    if (command.Name == normalizeInput)
-                    {
-                        matchCommandList.Add(command);
-                    }
-                }
-                if (command.CommandType == CommandTypes.RegularExpression)
-                {
-                    // command is regular expression
-                    Regex commandRegEx = new Regex(command.Name);
-                    if (commandRegEx.IsMatch(normalizeInput))
-                    {
-                        matchCommandList.Add(command);
-                    }
+                    matchCommand = command;
+                    break;
                 }
             }
 
-            if (matchCommandList.Count == 0)
+            if (matchCommand == null)
             {
-                return new Request(new SendMessageRequest
+                Request output = new Request(new SendMessageRequest
                     {
-                        Chat_Id = response.Message.Chat.Id,
-                        Text = string.Format("Неизвестная команда: {0}", normalizeInput)
+                        Chat_Id = update.Message.Chat.Id,
+                        Text = string.Format("Неизвестная команда: {0}", wordsList[0])
                     });
+                return _telegramBotService.SerializeRequest(output);
             }
 
-            // we need just one command in list
-            if (matchCommandList.Count > 1)
-            {
-                throw new InvalidOperationException(
-                    string.Format("there is ambiguity between commands {0} of bot with id {1}",
-                    string.Join(", ", matchCommandList.Select(n => n.Name), botId)));
-            }
-
-            //ok, at this point we have single match!
+            //ok, at this point we have match!
+            //we just ignore all commands if there is several ones and get only first
             //at this point update or create LastUpdate object
-            Command matchCommand = matchCommandList.First();
+
+            //check if there paramaters
+            Parameter matchParam = null;
+            if (wordsList.Count > 1)
+            {
+                //normalize parameters
+                wordsList.RemoveAt(0);
+                string normParams = string.Join(" ", wordsList);
+
+                foreach(Parameter param in matchCommand.Parameters)
+                {
+                    if (param.Type == ParameterTypes.Literal)
+                    {
+                        if (param.Expression == normParams)
+                        {
+                            matchParam = param;
+                            break;
+                        }
+                    }
+                    if (param.Type == ParameterTypes.RegularExpression)
+                    {
+                        Regex regex = new Regex(param.Expression);
+                        if (regex.IsMatch(normParams))
+                        {
+                            matchParam = param;
+                            break;
+                        }
+                    }
+                }
+
+                if (matchParam == null)
+                {
+                    Request output = new Request(new SendMessageRequest
+                    {
+                        Chat_Id = update.Message.Chat.Id,
+                        Text = string.Format("Неверно заданы параметры для команды: {0}", wordsList[0])
+                    });
+                    return _telegramBotService.SerializeRequest(output);
+                }
+            }
+            else
+            {
+                matchParam = matchCommand.Parameters.Where(n => string.IsNullOrEmpty(n.Expression)).First();
+                if (matchParam == null)
+                {
+                    Request output = new Request(new SendMessageRequest
+                    {
+                        Chat_Id = update.Message.Chat.Id,
+                        Text = string.Format("Неверно заданы параметры для команды: {0}", wordsList[0])
+                    });
+                    return _telegramBotService.SerializeRequest(output);
+                }
+            }
+
+
             if (lastUpdate == null)
             {
                 lastUpdate = new LastUpdate
                 {
                     BotId = bot.Id,
-                    ChatId = response.Message.Chat.Id.Value,
+                    ChatId = update.Message.Chat.Id.Value,
                     CurrentState = matchCommand.NextState,
-                    UpdateId = response.Update_Id.Value,
+                    UpdateId = update.Update_Id.Value,
                     Id = Guid.NewGuid()
                 };
-                bot.LastUpates.Add(lastUpdate);
+                bot.LastUpdates.Add(lastUpdate);
             }
             else
             {
                 lastUpdate.CurrentState = matchCommand.NextState;
-                lastUpdate.UpdateId = response.Update_Id.Value;
+                lastUpdate.UpdateId = update.Update_Id.Value;
             }
+            bot.BotStat.Requests = bot.BotStat.Requests + 1;
             _unitOfWork.Save();
 
             //and return response to user!
             Request request = new Request(new SendMessageRequest
                 {
-                    Chat_Id = response.Message.Chat.Id,
-                    Text = matchCommand.Response.Text
+                    Chat_Id = update.Message.Chat.Id,
+                    Text = matchParam.Response.Text
                 });
 
             return _telegramBotService.SerializeRequest(request);

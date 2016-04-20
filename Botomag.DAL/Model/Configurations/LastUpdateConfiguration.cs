@@ -7,7 +7,7 @@ namespace Botomag.DAL.Model.Configurations
     {
         public LastUpdateConfiguration()
         {
-            HasRequired(n => n.Bot).WithMany(n => n.LastUpates).HasForeignKey(n => n.BotId);
+            HasRequired(n => n.Bot).WithMany(n => n.LastUpdates).HasForeignKey(n => n.BotId);
         }
     }
 }

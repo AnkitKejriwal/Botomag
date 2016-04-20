@@ -9,7 +9,8 @@ namespace Botomag.DAL.Model.Configurations
         {
             Property(n => n.Name).IsRequired();
             HasRequired(n => n.Bot).WithMany(n => n.Commands).HasForeignKey(n => n.BotId);
-            HasRequired(n => n.Response).WithRequiredDependent();
+            HasMany(n => n.Parameters).WithRequired(n => n.Command).HasForeignKey(n => n.CommandId);
+            HasOptional(n => n.InvalidParameterResponse).WithOptionalPrincipal();
         }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using System;
 
+using TelegramBot.Core.Types.RequestTypes;
+
 namespace Botomag.DAL.Model
 {
     /// <summary>
