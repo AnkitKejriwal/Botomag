@@ -22,9 +22,8 @@ namespace Botomag.Web
             builder.RegisterControllers(typeof(MvcApplication).Assembly);
 
             // Register services
-            UnitOfWork unitOfWork = new UnitOfWork();
-            builder.RegisterInstance(unitOfWork).As<IUnitOfWork>();
 
+            builder.RegisterType<UnitOfWork>().As<IUnitOfWork>().InstancePerRequest();
             builder.RegisterType<BotService>().As<IBotService>();
             builder.RegisterType<MailService>().As<IMailService>();
             builder.RegisterType<TelegramBotService>().As<ITelegramBotService>();

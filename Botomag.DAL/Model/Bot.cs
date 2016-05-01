@@ -17,5 +17,9 @@ namespace Botomag.DAL.Model
         public virtual BotStat BotStat { get; set; }
 
         public virtual Response InvalidCommandResponse { get; set; }
+
+        public string Name { get; set; }
+
+        public DateTime? LastUpdate { get; set; }
     }
 }

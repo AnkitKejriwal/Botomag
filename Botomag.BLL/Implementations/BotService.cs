@@ -120,13 +120,24 @@ namespace Botomag.BLL.Implementations
                 }
 
                 // get bot name
-                Response<UserResponse> botInfo = _telegramBotService.Post<UserResponse>(bot.Token, new Request(new GetMeRequest()));
-                if (botInfo.Ok == false)
+                string botName = null;
+                if (bot.LastUpdate.HasValue && DateTime.Now - bot.LastUpdate.Value < TimeSpan.FromHours(3) && !string.IsNullOrEmpty(bot.Name))
                 {
-                    throw new InvalidOperationException(string.Format("it seems that bot with id {0} has invalid token {1}", botId, bot.Token));
+                    botName = bot.Name;
+                }
+                else
+                {
+                    Response<UserResponse> botInfo = _telegramBotService.Post<UserResponse>(bot.Token, new Request(new GetMeRequest()));
+                    if (botInfo.Ok == false)
+                    {
+                        throw new InvalidOperationException(string.Format("it seems that bot with id {0} has invalid token {1}", botId, bot.Token));
+                    }
+                    botName = botInfo.Result.UserName;
+                    bot.Name = botName;
+                    bot.LastUpdate = DateTime.Now;
                 }
 
-                Regex botNameRegEx = new Regex(@"^@" + botInfo.Result.UserName + @"$");
+                Regex botNameRegEx = new Regex(@"^@" + botName + @"$");
 
                 //if first word is the name of bot, just delete it
                 if (botNameRegEx.IsMatch(wordsList[0]))
@@ -155,11 +166,25 @@ namespace Botomag.BLL.Implementations
 
             if (matchCommand == null)
             {
-                Request output = new Request(new SendMessageRequest
+                Request output = null;
+
+                if (bot.InvalidCommandResponse == null)
+                {
+                    output = new Request(new SendMessageRequest
                     {
                         Chat_Id = update.Message.Chat.Id,
                         Text = string.Format("Неизвестная команда: {0}", wordsList[0])
                     });
+                }
+                else
+                {
+                    output = new Request(new SendMessageRequest
+                    {
+                        Chat_Id = update.Message.Chat.Id,
+                        Text = bot.InvalidCommandResponse.Text
+                    });
+                }
+
                 return _telegramBotService.SerializeRequest(output);
             }
 
@@ -198,11 +223,23 @@ namespace Botomag.BLL.Implementations
 
                 if (matchParam == null)
                 {
-                    Request output = new Request(new SendMessageRequest
+                    Request output = null;
+                    if (matchCommand.InvalidParameterResponse == null)
                     {
-                        Chat_Id = update.Message.Chat.Id,
-                        Text = string.Format("Неверно заданы параметры для команды: {0}", wordsList[0])
-                    });
+                        output = new Request(new SendMessageRequest
+                        {
+                            Chat_Id = update.Message.Chat.Id,
+                            Text = string.Format("Неверно заданы параметры для команды: {0}", wordsList[0])
+                        });
+                    }
+                    else
+                    {
+                        output = new Request(new SendMessageRequest
+                        {
+                            Chat_Id = update.Message.Chat.Id,
+                            Text = matchCommand.InvalidParameterResponse.Text
+                        });
+                    }
                     return _telegramBotService.SerializeRequest(output);
                 }
             }
@@ -211,11 +248,23 @@ namespace Botomag.BLL.Implementations
                 matchParam = matchCommand.Parameters.Where(n => string.IsNullOrEmpty(n.Expression)).First();
                 if (matchParam == null)
                 {
-                    Request output = new Request(new SendMessageRequest
+                    Request output = null;
+                    if (matchCommand.InvalidParameterResponse == null)
                     {
-                        Chat_Id = update.Message.Chat.Id,
-                        Text = string.Format("Неверно заданы параметры для команды: {0}", wordsList[0])
-                    });
+                        output = new Request(new SendMessageRequest
+                        {
+                            Chat_Id = update.Message.Chat.Id,
+                            Text = string.Format("Неверно заданы параметры для команды: {0}", wordsList[0])
+                        });
+                    }
+                    else
+                    {
+                        output = new Request(new SendMessageRequest
+                        {
+                            Chat_Id = update.Message.Chat.Id,
+                            Text = matchCommand.InvalidParameterResponse.Text
+                        });
+                    }
                     return _telegramBotService.SerializeRequest(output);
                 }
             }
