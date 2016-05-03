@@ -127,6 +127,7 @@ namespace Botomag.BLL.Implementations
                 }
                 else
                 {
+                    // refresh bot name every 3 hours
                     Response<UserResponse> botInfo = _telegramBotService.Post<UserResponse>(bot.Token, new Request(new GetMeRequest()));
                     if (botInfo.Ok == false)
                     {
@@ -229,7 +230,7 @@ namespace Botomag.BLL.Implementations
                         output = new Request(new SendMessageRequest
                         {
                             Chat_Id = update.Message.Chat.Id,
-                            Text = string.Format("Неверно заданы параметры для команды: {0}", wordsList[0])
+                            Text = string.Format("Неверно заданы параметры: {0} для команды: {1}", normParams, wordsList[0])
                         });
                     }
                     else
@@ -245,7 +246,7 @@ namespace Botomag.BLL.Implementations
             }
             else
             {
-                matchParam = matchCommand.Parameters.Where(n => string.IsNullOrEmpty(n.Expression)).First();
+                matchParam = matchCommand.Parameters.Where(n => string.IsNullOrEmpty(n.Expression)).FirstOrDefault();
                 if (matchParam == null)
                 {
                     Request output = null;
