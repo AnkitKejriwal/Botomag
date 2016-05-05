@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using Microsoft.Owin.Security;
 
 namespace Botomag.Web.Controllers
 {
@@ -13,6 +14,11 @@ namespace Botomag.Web.Controllers
     {
 
         #region Properties and Fields
+
+        protected IAuthenticationManager AuthManager
+        {
+            get { return HttpContext.GetOwinContext().Authentication; }
+        }
 
         #endregion Properties and Fields
 

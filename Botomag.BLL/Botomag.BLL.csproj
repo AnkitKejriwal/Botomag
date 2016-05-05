@@ -53,14 +53,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Contracts\IUserService.cs" />
     <Compile Include="Contracts\IBaseService.cs" />
     <Compile Include="Contracts\IBotService.cs" />
     <Compile Include="Contracts\IMailService.cs" />
+    <Compile Include="Implementations\UserService.cs" />
     <Compile Include="Implementations\BaseService.cs" />
     <Compile Include="Implementations\BotService.cs" />
     <Compile Include="Implementations\MailService.cs" />
     <Compile Include="Infrastructure\AutomapperConfig.cs" />
     <Compile Include="Model\BaseModel.cs" />
+    <Compile Include="Model\UserModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

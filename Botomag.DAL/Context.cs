@@ -22,6 +22,8 @@ namespace Botomag.DAL
 
         public DbSet<BotStat> BotStats { get; set; }
 
+        public DbSet<User> Users { get; set; }
+
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -35,6 +37,8 @@ namespace Botomag.DAL
             modelBuilder.Configurations.Add(new LastUpdateConfiguration());
 
             modelBuilder.Configurations.Add(new BotStatConfiguration());
+
+            modelBuilder.Configurations.Add(new UserConfiguration());
         }
     }
 }
