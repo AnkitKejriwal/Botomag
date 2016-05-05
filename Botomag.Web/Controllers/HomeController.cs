@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Threading.Tasks;
 using System.Text;
+using AutoMapper;
 
 using Botomag.BLL.Contracts;
 using Botomag.Web.Infrastructure;
@@ -26,7 +27,8 @@ namespace Botomag.Web.Controllers
 
         public HomeController(
             IBotService botService, 
-            IMailService mailService)
+            IMailService mailService,
+            IMapper mapper) : base(mapper)
         {
             _botService = botService;
             _mailService = mailService;

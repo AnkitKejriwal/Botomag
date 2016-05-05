@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Microsoft.Owin.Security;
+using AutoMapper;
 
 namespace Botomag.Web.Controllers
 {
@@ -15,14 +16,16 @@ namespace Botomag.Web.Controllers
 
         #region Properties and Fields
 
-        protected IAuthenticationManager AuthManager
-        {
-            get { return HttpContext.GetOwinContext().Authentication; }
-        }
+        protected IMapper _mapper { get; private set; }
 
         #endregion Properties and Fields
 
         #region Constructors
+
+        public BaseController(IMapper mapper)
+        {
+            _mapper = mapper;
+        }
 
         #endregion Constructors
 

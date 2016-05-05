@@ -2,7 +2,7 @@
 using AutoMapper;
 
 using Botomag.DAL.Model;
-using Botomag.BLL.Model;
+using Botomag.BLL.Models;
 
 namespace Botomag.BLL.Infrastructure
 {
@@ -10,7 +10,8 @@ namespace Botomag.BLL.Infrastructure
     {
         public static void Configuration(IMapperConfiguration config)
         {
-
+            config.CreateMap<UserModel, User>().
+                IncludeBase<BaseModel<Guid>, BaseEntity<Guid>>();
         }
     }
 }

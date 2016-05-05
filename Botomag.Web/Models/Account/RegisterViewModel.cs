@@ -15,7 +15,7 @@ namespace Botomag.Web.Models.Account
 
         [Display(Name = "Пароль")]
         [Required(AllowEmptyStrings = false, ErrorMessage = "Пароль явлется обязательным полем.")]
-        [StringLength(20, MinimumLength = 6, ErrorMessage = "Минимальная длина пароля: {0}, максимальная: {1}.")]
+        [StringLength(20, MinimumLength = 6, ErrorMessage = "Минимальная длина пароля: {2}, максимальная: {1}.")]
         [DataType(DataType.Password)]
         public string Password { get; set; }
 

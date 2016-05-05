@@ -27,8 +27,13 @@ namespace Botomag.Web
             builder.RegisterType<BotService>().As<IBotService>();
             builder.RegisterType<MailService>().As<IMailService>();
             builder.RegisterType<TelegramBotService>().As<ITelegramBotService>();
+            builder.RegisterType<UserService>().As<IUserService>();
 
-            MapperConfiguration config = new MapperConfiguration(cfg => Botomag.BLL.Infrastructure.AutomapperConfig.Configuration(cfg));
+            MapperConfiguration config = new MapperConfiguration(cfg => 
+                {
+                    Botomag.BLL.Infrastructure.AutomapperConfig.Configuration(cfg);
+                    AutomapperConfig.Configuration(cfg);
+                });
             config.AssertConfigurationIsValid();
             IMapper mapper = config.CreateMapper();
             builder.RegisterInstance(mapper).As<IMapper>();

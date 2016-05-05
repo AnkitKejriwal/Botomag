@@ -4,6 +4,6 @@ namespace Botomag.Web.Models
 {
     public class BaseViewModel<T> where T : struct
     {
-        T? Id { get; set; }
+        public T? Id { get; set; }
     }
 }

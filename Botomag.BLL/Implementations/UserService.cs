@@ -5,27 +5,27 @@ using AutoMapper;
 
 using Botomag.BLL.Contracts;
 using Botomag.DAL;
-using Botomag.BLL.Model;
+using Botomag.BLL.Models;
 using Botomag.DAL.Model;
 
 namespace Botomag.BLL.Implementations
 {
-    /// <summary>
-    /// Struct for return result of createing user and info message
-    /// </summary>
-    public struct CreateUserMessages
-    {
-        public const string UserAlreadyExists = "Пользователь с Email: {0} уже существует.";
-
-        public const string UserCreated = "Пользователь с Email: {0} успешно создан.";
-    }
-
     /// <summary>
     /// Service for authentication and authorization features in application
     /// </summary>
     public class UserService : BaseService, IUserService
     {
         #region Properties and Fields
+
+        /// <summary>
+        /// Struct for return result of createing user and info message
+        /// </summary>
+        private struct CreateUserMessages
+        {
+            public const string UserAlreadyExists = "Пользователь с Email: {0} уже существует.";
+
+            public const string UserCreated = "Пользователь с Email: {0} успешно создан.";
+        }
 
         #endregion Properties and Fields
 
@@ -37,7 +37,7 @@ namespace Botomag.BLL.Implementations
 
         #region Public Methods
 
-        public bool TryCreateUser(UserModel model, out string Message)
+        public CreateUserResult CreateUser(UserModel model)
         {
             if (model == null)
             {
@@ -53,23 +53,29 @@ namespace Botomag.BLL.Implementations
 
             User user = userRepo.Get(n => n.Email == model.Email).FirstOrDefault();
 
+            string message = null;
+
             if (user != null)
             {
-                Message = string.Format(CreateUserMessages.UserAlreadyExists, model.Email);
-                return false;
+                message = string.Format(CreateUserMessages.UserAlreadyExists, model.Email);
+                return new CreateUserResult(null, message, false);
             }
 
             model.PasswordHash = HashPassword(model.Password);
+            model.Id = Guid.NewGuid();
 
-            user = Mapper.Map<User>(model);
+            user = _mapper.Map<User>(model);
 
             userRepo.Add(user);
 
             _unitOfWork.Save();
 
-            Message = string.Format(CreateUserMessages.UserCreated, model.Email);
+            message = string.Format(CreateUserMessages.UserCreated, model.Email);
 
-            return true;
+            model.Password = null;
+            model.PasswordHash = null;
+
+            return new CreateUserResult(model, message, true);
         }
 
         #endregion Public Methods

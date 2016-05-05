@@ -67,6 +67,10 @@
     <Compile Include="Migrations\201605031342055_AddBot_NameBot_LastUpdate.Designer.cs">
       <DependentUpon>201605031342055_AddBot_NameBot_LastUpdate.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201605051652124_AddUser.cs" />
+    <Compile Include="Migrations\201605051652124_AddUser.Designer.cs">
+      <DependentUpon>201605051652124_AddUser.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Model\BaseEntity.cs" />
     <Compile Include="Model\Bot.cs" />
@@ -107,6 +111,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201605031342055_AddBot_NameBot_LastUpdate.resx">
       <DependentUpon>201605031342055_AddBot_NameBot_LastUpdate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201605051652124_AddUser.resx">
+      <DependentUpon>201605051652124_AddUser.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

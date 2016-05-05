@@ -1,11 +1,11 @@
 ﻿using System;
 
-using Botomag.BLL.Model;
+using Botomag.BLL.Models;
 
 namespace Botomag.BLL.Contracts
 {
     public interface IUserService 
     {
-        bool TryCreateUser(UserModel model, out string Message);
+        CreateUserResult CreateUser(UserModel model);
     }
 }
