@@ -1,7 +1,7 @@
 ﻿using Botomag.DAL.Model;
 using System;
 using System.Linq;
-using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace Botomag.DAL
 {
@@ -11,9 +11,10 @@ namespace Botomag.DAL
 
         TEntity Remove(TEntity entity);
 
-        void Update(TEntity entity);
+        IQueryable<TEntity> Get();
 
-        IQueryable<TEntity> Get(Expression<Func<TEntity, bool>> predicate = null,
-                    params Expression<Func<TEntity, object>>[] propertiesInclude);
+        TEntity Find(TKey key);
+
+        Task<TEntity> FindAsync(TKey key);
     }
 }

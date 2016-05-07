@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using Botomag.DAL.Model;
 
@@ -40,27 +41,24 @@ namespace Botomag.DAL
             return _repos[typeof(TEntity)] as Repository<TEntity, TKey>;
         }
 
-        private void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                if (_context != null)
-                {
-                    _context.Dispose();
-                }
-                _context = null;
-            }
-        }
-
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            if (_context != null)
+            {
+                _context.Dispose();
+                _context = null;
+                GC.SuppressFinalize(this);
+            }
         }
 
         public int Save()
         {
             return _context.SaveChanges();
+        }
+
+        public async Task<int> SaveAsync()
+        {
+            return await _context.SaveChangesAsync();
         }
     }
 }

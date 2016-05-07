@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 using Botomag.BLL.Models;
 
@@ -6,6 +7,6 @@ namespace Botomag.BLL.Contracts
 {
     public interface IUserService 
     {
-        CreateUserResult CreateUser(UserModel model);
+        Task<CreateUserResult> CreateUserAsync(UserModel model);
     }
 }

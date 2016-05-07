@@ -51,11 +51,11 @@ namespace Botomag.Web.Controllers
         /// <returns>Json result with message response</returns>
         //[RequireHttps]
         [HttpPost]
-        public void PostMessage(Guid? id = null)
+        public async void PostMessage(Guid? id = null)
         {
             if (id.HasValue)
             {
-                string result = _botService.ProcessUpdate(id.Value, Request.InputStream);
+                string result = await _botService.ProcessUpdateAsync(id.Value, Request.InputStream);
                 HttpContext.Response.ContentType = "application/json";
                 HttpContext.Response.ContentEncoding = Encoding.UTF8;
                 HttpContext.Response.Write(result);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
 using System.Security.Claims;
@@ -50,13 +51,13 @@ namespace Botomag.Web.Controllers
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
         [HttpPost]
-        public ActionResult Register(RegisterViewModel model, string returnUrl)
+        public async Task<ActionResult> Register(RegisterViewModel model, string returnUrl)
         {
             if (ModelState.IsValid)
             {
                 // try to create new user
                 UserModel newUser = _mapper.Map<UserModel>(model);
-                CreateUserResult result = _userService.CreateUser(newUser);
+                CreateUserResult result = await _userService.CreateUserAsync(newUser);
 
                 if (result.IsSuccess)
                 {

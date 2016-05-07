@@ -4,6 +4,7 @@ using System.Web.Mvc;
 using Autofac;
 using Autofac.Integration.Mvc;
 using AutoMapper;
+using Microsoft.AspNet.Identity;
 
 using Botomag.BLL.Contracts;
 using Botomag.BLL.Implementations;
@@ -28,6 +29,7 @@ namespace Botomag.Web
             builder.RegisterType<MailService>().As<IMailService>();
             builder.RegisterType<TelegramBotService>().As<ITelegramBotService>();
             builder.RegisterType<UserService>().As<IUserService>();
+            builder.RegisterType<PasswordHasher>().As<IPasswordHasher>();
 
             MapperConfiguration config = new MapperConfiguration(cfg => 
                 {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using Botomag.DAL.Model;
 
@@ -11,5 +12,7 @@ namespace Botomag.DAL
             where TKey : struct;
 
         int Save();
+
+        Task<int> SaveAsync();
     }
 }

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using AutoMapper;
 
 using Botomag.BLL.Contracts;
@@ -36,7 +37,7 @@ namespace Botomag.BLL.Implementations
 
         #endregion Constructors
 
-        #region Methods
+        #region Public Methods
 
         /// <summary>
         /// Process update belongs to appropriate bot identified by token
@@ -44,7 +45,21 @@ namespace Botomag.BLL.Implementations
         /// <param name="token">Unique bot token</param>
         /// <param name="stream">Stream of webhook request</param>
         /// <returns>Object for response</returns>
-        public string ProcessUpdate(Guid botId, Stream stream)
+        public Task<string> ProcessUpdateAsync(Guid botId, Stream stream)
+        {
+            if (stream == null)
+            {
+                throw new ArgumentNullException("stream.");
+            }
+
+            return Task<string>.Factory.StartNew(() => _ProcessUpdateAsync(botId, stream).Result);
+        }
+
+        #endregion Public Methods
+
+        #region Private Methods
+
+        private async Task<string> _ProcessUpdateAsync(Guid botId, Stream stream)
         {
             if (stream == null)
             {
@@ -52,7 +67,8 @@ namespace Botomag.BLL.Implementations
             }
 
             IRepository<Bot, Guid> botRepo = _unitOfWork.GetRepository<Bot, Guid>();
-            Bot bot = botRepo.Get(n => n.Id == botId).FirstOrDefault();
+
+            Bot bot = await botRepo.FindAsync(botId);
 
             if (bot == null)
             {
@@ -60,10 +76,10 @@ namespace Botomag.BLL.Implementations
             }
 
             // Take update object
-            UpdateResponse update = _telegramBotService.ReadMessage<UpdateResponse>(stream);
+            UpdateResponse update = await _telegramBotService.ReadMessageAsync<UpdateResponse>(stream);
 
             // Search last update with such chat_id in response
-            LastUpdate lastUpdate = bot.LastUpdates.Where(n => n.ChatId == update.Message.Chat.Id).FirstOrDefault();
+            LastUpdate lastUpdate = await Task<LastUpdate>.Factory.StartNew(() => bot.LastUpdates.Where(n => n.ChatId == update.Message.Chat.Id).FirstOrDefault());
 
             List<Command> commands = new List<Command>();
 
@@ -73,7 +89,7 @@ namespace Botomag.BLL.Implementations
             {
                 // There is no conversation for this chat
                 // so we search command with current state = initial state
-                commands = bot.Commands.Where(n => n.CurrentState == expectedState).ToList();
+                commands = await Task<List<Command>>.Factory.StartNew(() => bot.Commands.Where(n => n.CurrentState == expectedState).ToList());
             }
             else
             {
@@ -90,12 +106,12 @@ namespace Botomag.BLL.Implementations
                 {
                     //there is the same conversation, continue
                     expectedState = lastUpdate.CurrentState;
-                    commands = bot.Commands.Where(n => n.CurrentState == expectedState).ToList();                    
+                    commands = await Task<List<Command>>.Factory.StartNew(() => bot.Commands.Where(n => n.CurrentState == expectedState).ToList());
                 }
                 else
                 {
                     //there is new conversation
-                    commands = bot.Commands.Where(n => n.CurrentState == expectedState).ToList();
+                    commands = await Task<List<Command>>.Factory.StartNew(() => bot.Commands.Where(n => n.CurrentState == expectedState).ToList());
                 }
             }
 
@@ -128,7 +144,7 @@ namespace Botomag.BLL.Implementations
                 else
                 {
                     // refresh bot name every 3 hours
-                    Response<UserResponse> botInfo = _telegramBotService.Post<UserResponse>(bot.Token, new Request(new GetMeRequest()));
+                    Response<UserResponse> botInfo = await _telegramBotService.PostAsync<UserResponse>(bot.Token, new Request(new GetMeRequest()));
                     if (botInfo.Ok == false)
                     {
                         throw new InvalidOperationException(string.Format("it seems that bot with id {0} has invalid token {1}", botId, bot.Token));
@@ -155,7 +171,7 @@ namespace Botomag.BLL.Implementations
             // search match command
             Command matchCommand = null;
 
-            foreach(Command command in commands)
+            foreach (Command command in commands)
             {
                 // command must interpretate as literal object
                 if (command.Name == wordsList[0])
@@ -201,7 +217,7 @@ namespace Botomag.BLL.Implementations
                 wordsList.RemoveAt(0);
                 string normParams = string.Join(" ", wordsList);
 
-                foreach(Parameter param in matchCommand.Parameters)
+                foreach (Parameter param in matchCommand.Parameters)
                 {
                     if (param.Type == ParameterTypes.Literal)
                     {
@@ -246,7 +262,7 @@ namespace Botomag.BLL.Implementations
             }
             else
             {
-                matchParam = matchCommand.Parameters.Where(n => string.IsNullOrEmpty(n.Expression)).FirstOrDefault();
+                matchParam = await Task<Parameter>.Factory.StartNew(() => matchCommand.Parameters.Where(n => string.IsNullOrEmpty(n.Expression)).FirstOrDefault());
                 if (matchParam == null)
                 {
                     Request output = null;
@@ -289,18 +305,18 @@ namespace Botomag.BLL.Implementations
                 lastUpdate.UpdateId = update.Update_Id.Value;
             }
             bot.BotStat.Requests = bot.BotStat.Requests + 1;
-            _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
 
             //and return response to user!
             Request request = new Request(new SendMessageRequest
-                {
-                    Chat_Id = update.Message.Chat.Id,
-                    Text = matchParam.Response.Text
-                });
+            {
+                Chat_Id = update.Message.Chat.Id,
+                Text = matchParam.Response.Text
+            });
 
             return _telegramBotService.SerializeRequest(request);
         }
 
-        #endregion Methods
+        #endregion Private Methods
     }
 }

@@ -4,6 +4,7 @@ using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Linq.Expressions;
 using System;
+using System.Threading.Tasks;
 
 namespace Botomag.DAL
 {
@@ -27,66 +28,42 @@ namespace Botomag.DAL
 
         public Repository(Context context)
         {
-            _context = context;
-            lock(_context)
-            {
-                _dbSet = context.Set<TEntity>();
-            }
+            _dbSet = context.Set<TEntity>();
         }
 
         public TEntity Add(TEntity entity)
         {
             TEntity result;
-            lock(_context)
-            {
-                result = _dbSet.Add(entity);
-            }
+            result = _dbSet.Add(entity);
             return result;
         }
 
         public TEntity Remove(TEntity entity)
         {
             TEntity result;
-            lock(_context)
-            {
-                result = _dbSet.Remove(entity);
-            }
+            result = _dbSet.Remove(entity);
             return result;
         }
 
-        public void Update(TEntity entity)
-        {
-            lock(_context)
-            {
-                DbEntityEntry entry = _context.Entry<TEntity>(entity);
-                if (entry.State == EntityState.Detached)
-                {
-                    _dbSet.Attach(entity);
-                }
-                entry.State = EntityState.Modified;
-            }
-        }
-
-        public IQueryable<TEntity> Get(Expression<Func<TEntity, bool>> predicate = null, 
-            params Expression<Func<TEntity, object>>[] propertiesInclude)
+        public IQueryable<TEntity> Get()
         {
             IQueryable<TEntity> query;
-            lock(_context)
-            {
-                query = _dbSet.AsQueryable();
-            }
 
-            if (predicate != null)
-            {
-                query = query.Where(predicate);
-            }
-
-            foreach (Expression<Func<TEntity, object>> property in propertiesInclude)
-            {
-                query = query.Include(property);
-            }
+            query = _dbSet.AsQueryable();
 
             return query;
+        }
+
+        public TEntity Find(params TKey key)
+        {
+            TEntity entity = _dbSet.Find(key);
+            return entity;
+        }
+
+        public async Task<TEntity> FindAsync(TKey key)
+        {
+            TEntity entity = await _dbSet.FindAsync(key);
+            return entity;
         }
     }
 }
