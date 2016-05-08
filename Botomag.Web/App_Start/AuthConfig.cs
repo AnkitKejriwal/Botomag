@@ -6,6 +6,8 @@ using Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.AspNet.Identity;
+using System.Web.Helpers;
+using System.Security.Claims;
 
 [assembly: OwinStartup(typeof(Botomag.AuthConfig))]
 namespace Botomag
@@ -19,6 +21,8 @@ namespace Botomag
                 AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie, 
                 LoginPath = new PathString("/Account/Login")
             });
+
+            AntiForgeryConfig.UniqueClaimTypeIdentifier = ClaimTypes.NameIdentifier;
         }
     }
 }

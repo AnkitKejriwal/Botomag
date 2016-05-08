@@ -54,7 +54,7 @@ namespace Botomag.DAL
             return query;
         }
 
-        public TEntity Find(params TKey key)
+        public TEntity Find(TKey key)
         {
             TEntity entity = _dbSet.Find(key);
             return entity;

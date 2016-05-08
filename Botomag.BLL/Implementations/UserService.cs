@@ -46,7 +46,32 @@ namespace Botomag.BLL.Implementations
 
         public Task<CreateUserResult> CreateUserAsync(UserModel model)
         {
+            if (model == null)
+            {
+                throw new ArgumentNullException("model.");
+            }
+
+            if (model.Email == null || model.Password == null)
+            {
+                throw new ArgumentNullException("one or few of required properties are missed.");
+            }
+
             return Task<CreateUserResult>.Factory.StartNew(() => _CreateUserAsync(model).Result);
+        }
+
+        public Task<VerifyUserResult> IsUserValidAsync(UserModel model)
+        {
+            if (model == null)
+            {
+                throw new ArgumentNullException("model.");
+            }
+
+            if (model.Email == null || model.Password == null)
+            {
+                throw new ArgumentNullException("one or few of required properties are missed.");
+            }
+
+            return Task<VerifyUserResult>.Factory.StartNew(() => _IsUserValidAsync(model).Result);
         }
 
         #endregion Public Methods
@@ -92,6 +117,37 @@ namespace Botomag.BLL.Implementations
             model.PasswordHash = null;
 
             return new CreateUserResult(model, message, true);
+        }
+
+        private async Task<VerifyUserResult> _IsUserValidAsync(UserModel model)
+        {
+            if (model == null)
+            {
+                throw new ArgumentNullException("model.");
+            }
+
+            if (model.Email == null || model.Password == null)
+            {
+                throw new ArgumentNullException("one or few of required properties are missed.");
+            }
+
+            VerifyUserResult result = new VerifyUserResult { User = model, IsValid = false };
+
+            User user = await Task<User>.Factory.StartNew(() => _unitOfWork.GetRepository<User, Guid>().Get().
+                Where(n => n.Email == model.Email).FirstOrDefault());
+
+            if (user != null)
+            {
+                result.User = _mapper.Map<UserModel>(user);
+                PasswordVerificationResult verification = _hasher.VerifyHashedPassword(user.PasswordHash, model.Password);
+                if (verification == PasswordVerificationResult.Success || verification == PasswordVerificationResult.SuccessRehashNeeded)
+                {
+
+                    result.IsValid = true;
+                }
+            }
+
+            return result;
         }
 
         #endregion Private Methods

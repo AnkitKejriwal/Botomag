@@ -12,6 +12,7 @@ namespace Botomag.DAL.Model.Configurations
             HasMany(n => n.LastUpdates).WithRequired(n => n.Bot).HasForeignKey(n => n.BotId);
             HasRequired(n => n.BotStat).WithRequiredPrincipal(n => n.Bot);
             HasOptional(n => n.InvalidCommandResponse).WithOptionalPrincipal();
+            HasRequired(n => n.User).WithMany(n => n.Bots).HasForeignKey(n => n.UserId);
         }
     }
 }

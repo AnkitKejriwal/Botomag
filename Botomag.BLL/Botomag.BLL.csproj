@@ -62,6 +62,7 @@
     <Compile Include="Contracts\IBaseService.cs" />
     <Compile Include="Contracts\IBotService.cs" />
     <Compile Include="Contracts\IMailService.cs" />
+    <Compile Include="Contracts\VerifyUserResult.cs" />
     <Compile Include="Implementations\UserService.cs" />
     <Compile Include="Implementations\BaseService.cs" />
     <Compile Include="Implementations\BotService.cs" />

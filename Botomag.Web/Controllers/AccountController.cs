@@ -62,7 +62,7 @@ namespace Botomag.Web.Controllers
                 if (result.IsSuccess)
                 {
                     // sign in user and redirect
-                    SignIn(result.User, false);
+                    _SignIn(newUser.Id.ToString(), newUser.Email, model.IsPersistent);
                     if (returnUrl != null)
                     {
                         return Redirect(returnUrl);
@@ -81,15 +81,61 @@ namespace Botomag.Web.Controllers
             return View(model);
         }
 
+        [AllowAnonymous]
+        [HttpGet]
+        public ActionResult Login()
+        {
+            return View();
+        }
+
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        [HttpPost]
+        public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
+        {
+            if (ModelState.IsValid)
+            {
+                //check user
+                UserModel user = _mapper.Map<UserModel>(model);
+                VerifyUserResult result = await _userService.IsUserValidAsync(user);
+                if (result.IsValid == true)
+                {
+                    _SignOut();
+                    _SignIn(result.User.Id.ToString(), result.User.Email, model.IsPersistent);
+                    if (returnUrl != null)
+                    {
+                        return Redirect(returnUrl);
+                    }
+                    else
+                    {
+                        return RedirectToAction("Index", "Home");
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Вы ввели неверный пароль.");
+                    return View(model);
+                }
+            }
+            return View(model);
+        }
+
+        [HttpGet]
+        public ActionResult Logout()
+        {
+            _SignOut();
+            return RedirectToAction("Index", "Home");
+        }
+
         #endregion Public Methods
 
         #region Private Methods
 
-        private void SignIn(UserModel user, bool isPersistent)
+        private void _SignIn(string id, string email, bool isPersistent)
         {
             List<Claim> claims = new List<Claim>();
-            claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
-            claims.Add(new Claim(ClaimTypes.Email, user.Email));
+            claims.Add(new Claim(ClaimTypes.NameIdentifier, id));
+            claims.Add(new Claim(ClaimTypes.Email, email));
             ClaimsIdentity identity = new ClaimsIdentity(claims, DefaultAuthenticationTypes.ApplicationCookie);
             _authManager.SignIn(new AuthenticationProperties
                 {
@@ -97,6 +143,11 @@ namespace Botomag.Web.Controllers
                     ExpiresUtc = DateTime.UtcNow.AddDays(7),
                     AllowRefresh = true
                 }, identity);
+        }
+
+        private void _SignOut()
+        {
+            _authManager.SignOut();
         }
 
         #endregion Private Methods

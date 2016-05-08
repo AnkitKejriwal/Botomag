@@ -28,6 +28,21 @@ namespace Botomag.DAL.Migrations
             //      new Person { FullName = "Rowan Miller" }
             //    );
             //
+
+            //create first user
+            User user = context.Users.Where(n => n.Email == "test@contoso.com").FirstOrDefault();
+            Guid firstUserId = new Guid("A89B45C2-9B9D-465B-8376-216C8267BA36");
+            if (user == null)
+            {
+                user = new User
+                {
+                    Email = "test@contoso.com",
+                    Id = firstUserId,
+                    PasswordHash = "AAFij3pt0lR4lA7MTZ6oPoPMsgwOEwMJXGdLmkJ3/rVEkUollCsUiJz8igQdhsxy2g==",
+                };
+                context.Users.Add(user);
+            }
+
             //create entries for test bot
             Guid testBotId = new Guid("9EFD5204-F97A-4AC2-8163-7EFF4B73E2F2");
             string testBotToken = "219824686:AAFkrCCS1yRhdjKBfUrNbd6VlzNiDChHOMc";
@@ -38,7 +53,8 @@ namespace Botomag.DAL.Migrations
                 {
                     Id = testBotId,
                     Token = testBotToken,
-                    BotStat = new BotStat { Id = testBotId, Requests = 0 }
+                    BotStat = new BotStat { Id = testBotId, Requests = 0 },
+                    UserId = user.Id
                 };
 
                 string commandexp = "/factor";

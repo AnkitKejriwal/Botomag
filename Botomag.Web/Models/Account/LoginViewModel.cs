@@ -3,10 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Botomag.Web.Models.Account
 {
-    /// <summary>
-    /// Used for register new user in app
-    /// </summary>
-    public class RegisterViewModel : BaseViewModel<Guid>
+    public class LoginViewModel : BaseViewModel<Guid>
     {
         [Display(Name = "Email")]
         [Required(AllowEmptyStrings = false, ErrorMessage = "Email является обязательным полем.")]
@@ -18,11 +15,6 @@ namespace Botomag.Web.Models.Account
         [StringLength(20, MinimumLength = 6, ErrorMessage = "Минимальная длина пароля: {2}, максимальная: {1}.")]
         [DataType(DataType.Password)]
         public string Password { get; set; }
-
-        [Display(Name = "Подтверждение пароля")]
-        [DataType(DataType.Password)]
-        [Compare("Password", ErrorMessage = "Поля \"Пароль\" и \"Подтверждение пароля\" должны совпадать")]
-        public string ConfirmPassword { get; set; }
 
         [Display(Name = "Запомнить меня")]
         public bool IsPersistent { get; set; }

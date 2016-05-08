@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
+using System.Web.Optimization;
 
 namespace Botomag.Web
 {
@@ -16,6 +17,7 @@ namespace Botomag.Web
             MigrationsConfig.Configuration();
             AutofacConfig.Configuration();
             DbConfig.Configuration();
+            BundleConfig.RegisterBundles(BundleTable.Bundles);
         }
     }
 }

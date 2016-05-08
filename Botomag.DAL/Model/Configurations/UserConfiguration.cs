@@ -9,6 +9,7 @@ namespace Botomag.DAL.Model.Configurations
         {
             Property(n => n.PasswordHash).IsRequired();
             Property(n => n.Email).IsRequired();
+            HasMany(n => n.Bots).WithRequired(n => n.User).HasForeignKey(n => n.UserId);
         }
     }
 }

@@ -11,7 +11,11 @@ namespace Botomag.BLL.Infrastructure
         public static void Configuration(IMapperConfiguration config)
         {
             config.CreateMap<UserModel, User>().
-                IncludeBase<BaseModel<Guid>, BaseEntity<Guid>>();
+                ForMember(trg => trg.Bots, opt => opt.Ignore()).
+                IncludeBase<BaseModel<Guid>, BaseEntity<Guid>>().
+                ReverseMap().
+                ForMember(trg => trg.Password, opt => opt.Ignore()).
+                IncludeBase<BaseEntity<Guid>, BaseModel<Guid>>();
         }
     }
 }

@@ -55,6 +55,11 @@ namespace Botomag.BLL.Implementations
             return Task<string>.Factory.StartNew(() => _ProcessUpdateAsync(botId, stream).Result);
         }
 
+        public Task<IEnumerable<string>> GetBotNamesByUserIdAsync(Guid userId)
+        {
+            return Task<IEnumerable<string>>.Factory.StartNew(() => _GetBotNamesByUserId(userId).Result);
+        }
+
         #endregion Public Methods
 
         #region Private Methods
@@ -136,23 +141,8 @@ namespace Botomag.BLL.Implementations
                 }
 
                 // get bot name
-                string botName = null;
-                if (bot.LastUpdate.HasValue && DateTime.Now - bot.LastUpdate.Value < TimeSpan.FromHours(3) && !string.IsNullOrEmpty(bot.Name))
-                {
-                    botName = bot.Name;
-                }
-                else
-                {
-                    // refresh bot name every 3 hours
-                    Response<UserResponse> botInfo = await _telegramBotService.PostAsync<UserResponse>(bot.Token, new Request(new GetMeRequest()));
-                    if (botInfo.Ok == false)
-                    {
-                        throw new InvalidOperationException(string.Format("it seems that bot with id {0} has invalid token {1}", botId, bot.Token));
-                    }
-                    botName = botInfo.Result.UserName;
-                    bot.Name = botName;
-                    bot.LastUpdate = DateTime.Now;
-                }
+                bot = await _RefreshBotName(bot);
+                string botName = bot.Name;
 
                 Regex botNameRegEx = new Regex(@"^@" + botName + @"$");
 
@@ -315,6 +305,48 @@ namespace Botomag.BLL.Implementations
             });
 
             return _telegramBotService.SerializeRequest(request);
+        }
+
+        private async Task<IEnumerable<string>> _GetBotNamesByUserId(Guid userId)
+        {
+            Bot[] bots = await Task<Bot[]>.Factory.StartNew(() => 
+                _unitOfWork.GetRepository<Bot, Guid>().Get().Where(n => n.UserId == userId).ToArray());
+            string[] botNames = new string[bots.Length];
+            for (int i = 0; i < bots.Length; ++i )
+            {
+                Bot updatedBot = await _RefreshBotName(bots[i]);
+                if (bots[i].Name != updatedBot.Name)
+                {
+                    bots[i].Name = updatedBot.Name;
+                    bots[i].LastUpdate = updatedBot.LastUpdate;
+                }
+                else
+                {
+                    if (bots[i].LastUpdate != updatedBot.LastUpdate)
+                    {
+                        bots[i].LastUpdate = updatedBot.LastUpdate;
+                    }
+                }
+                botNames[i] = bots[i].Name;
+            }
+            await _unitOfWork.SaveAsync();
+            return botNames;
+        }
+
+        private async Task<Bot> _RefreshBotName(Bot bot)
+        {
+            if (!(bot.LastUpdate.HasValue && DateTime.Now - bot.LastUpdate.Value < TimeSpan.FromHours(3) && !string.IsNullOrEmpty(bot.Name)))
+            {
+                // refresh bot name every 3 hours
+                Response<UserResponse> botInfo = await _telegramBotService.PostAsync<UserResponse>(bot.Token, new Request(new GetMeRequest()));
+                if (botInfo.Ok == false)
+                {
+                    throw new InvalidOperationException(string.Format("it seems that bot with id {0} has invalid token {1}", bot.Id, bot.Token));
+                }
+                bot.Name = botInfo.Result.UserName;
+                bot.LastUpdate = DateTime.Now;  
+            }
+            return bot;
         }
 
         #endregion Private Methods

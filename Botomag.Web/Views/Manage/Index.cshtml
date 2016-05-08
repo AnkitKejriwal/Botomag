@@ -1,0 +1,20 @@
+﻿@model IEnumerable<string>
+
+@{
+    ViewBag.Title = "Зарегистрированные боты";
+}
+
+@section Styles {
+    @Styles.Render("~/Content/jqGrid")
+}
+
+<div class="container">
+    @foreach(string botName in Model)
+    {
+        <p>@botName</p>
+    }
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqGrid")
+}
