@@ -9,12 +9,51 @@
 }
 
 <div class="container">
-    @foreach(string botName in Model)
-    {
-        <p>@botName</p>
-    }
+    <table id="botsGrid"></table>
+    <div id="botsPager"></div>
+    <table id="botDetailsGrid"></table>
 </div>
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqGrid")
+    <script>
+    $(document).ready(function () {
+        $("#botsGrid").jqGrid({
+            url: '@Url.Action("GetBots")',
+            mtype: "GET",
+            styleUI: 'Bootstrap',
+            datatype: "json",
+            colModel: [
+                { name: 'Id', key: true, hidden: true },
+                { label: 'Имя', name: 'Name', width: 150 },
+            ],
+            viewrecords: true,
+            height: 250,
+            width: 780,
+            rowNum: 10,
+            rowList: [10, 25, 50],
+            pager: "#botsPager",
+            @*loadError: window.location.href = '@Url.Action("Error", "Base")',*@
+            onSelectRow: function (id) {
+                jQuery("#botDetailsGrid").jqGrid('setGridParam', { url: '@Url.Action("GetBotDetails")' + '?id=' + id, page: 1 }).trigger('reloadGrid');
+            }
+        });
+
+        $("#botDetailsGrid").jqGrid({
+            url: '@Url.Action("GetBotDetails")',
+            mtype: "GET",
+            styleUI: 'Bootstrap',
+            datatype: "json",
+            colModel: [
+                { name: 'Id', key: true },
+            ],
+            viewrecords: true,
+            height: 250,
+            width: 780,
+            rowNum: 10,
+            @*loadError: window.location.href = '@Url.Action("Error", "Base")'*@
+        });
+
+    });
+</script>
 }

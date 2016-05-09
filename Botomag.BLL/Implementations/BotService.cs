@@ -5,6 +5,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AutoMapper;
+using System.Linq.Expressions;
 
 using Botomag.BLL.Contracts;
 using Botomag.DAL;
@@ -12,6 +13,7 @@ using Botomag.DAL.Model;
 using TelegramBot.Core.Services.Contracts;
 using TelegramBot.Core.Types.ResponseTypes;
 using TelegramBot.Core.Types.RequestTypes;
+using Botomag.BLL.Models;
 
 namespace Botomag.BLL.Implementations
 {
@@ -52,19 +54,24 @@ namespace Botomag.BLL.Implementations
                 throw new ArgumentNullException("stream.");
             }
 
-            return Task<string>.Factory.StartNew(() => _ProcessUpdateAsync(botId, stream).Result);
+            return Task<string>.Factory.StartNew(() => _ProcessUpdate(botId, stream));
         }
 
-        public Task<IEnumerable<string>> GetBotNamesByUserIdAsync(Guid userId)
+        public Task<IEnumerable<BotModel>> GetBotsByUserIdAsync(Guid userId, int? skip = null, int? take = null)
         {
-            return Task<IEnumerable<string>>.Factory.StartNew(() => _GetBotNamesByUserId(userId).Result);
+            return Task<IEnumerable<BotModel>>.Factory.StartNew(() => _GetBotsByUserId(userId, skip, take));
+        }
+
+        public Task<int> GetBotsCountByUserIdAsync(Guid userId)
+        {
+            return Task<int>.Factory.StartNew(() => _GetBotsCountByUserId(userId));
         }
 
         #endregion Public Methods
 
         #region Private Methods
 
-        private async Task<string> _ProcessUpdateAsync(Guid botId, Stream stream)
+        private string _ProcessUpdate(Guid botId, Stream stream)
         {
             if (stream == null)
             {
@@ -73,7 +80,7 @@ namespace Botomag.BLL.Implementations
 
             IRepository<Bot, Guid> botRepo = _unitOfWork.GetRepository<Bot, Guid>();
 
-            Bot bot = await botRepo.FindAsync(botId);
+            Bot bot = botRepo.Find(botId);
 
             if (bot == null)
             {
@@ -81,10 +88,10 @@ namespace Botomag.BLL.Implementations
             }
 
             // Take update object
-            UpdateResponse update = await _telegramBotService.ReadMessageAsync<UpdateResponse>(stream);
+            UpdateResponse update = _telegramBotService.ReadMessage<UpdateResponse>(stream);
 
             // Search last update with such chat_id in response
-            LastUpdate lastUpdate = await Task<LastUpdate>.Factory.StartNew(() => bot.LastUpdates.Where(n => n.ChatId == update.Message.Chat.Id).FirstOrDefault());
+            LastUpdate lastUpdate = bot.LastUpdates.Where(n => n.ChatId == update.Message.Chat.Id).FirstOrDefault();
 
             List<Command> commands = new List<Command>();
 
@@ -94,7 +101,7 @@ namespace Botomag.BLL.Implementations
             {
                 // There is no conversation for this chat
                 // so we search command with current state = initial state
-                commands = await Task<List<Command>>.Factory.StartNew(() => bot.Commands.Where(n => n.CurrentState == expectedState).ToList());
+                commands = bot.Commands.Where(n => n.CurrentState == expectedState).ToList();
             }
             else
             {
@@ -111,12 +118,12 @@ namespace Botomag.BLL.Implementations
                 {
                     //there is the same conversation, continue
                     expectedState = lastUpdate.CurrentState;
-                    commands = await Task<List<Command>>.Factory.StartNew(() => bot.Commands.Where(n => n.CurrentState == expectedState).ToList());
+                    commands = bot.Commands.Where(n => n.CurrentState == expectedState).ToList();
                 }
                 else
                 {
                     //there is new conversation
-                    commands = await Task<List<Command>>.Factory.StartNew(() => bot.Commands.Where(n => n.CurrentState == expectedState).ToList());
+                    commands = bot.Commands.Where(n => n.CurrentState == expectedState).ToList();
                 }
             }
 
@@ -141,7 +148,7 @@ namespace Botomag.BLL.Implementations
                 }
 
                 // get bot name
-                bot = await _RefreshBotName(bot);
+                bot = _RefreshBotName(bot);
                 string botName = bot.Name;
 
                 Regex botNameRegEx = new Regex(@"^@" + botName + @"$");
@@ -252,7 +259,7 @@ namespace Botomag.BLL.Implementations
             }
             else
             {
-                matchParam = await Task<Parameter>.Factory.StartNew(() => matchCommand.Parameters.Where(n => string.IsNullOrEmpty(n.Expression)).FirstOrDefault());
+                matchParam = matchCommand.Parameters.Where(n => string.IsNullOrEmpty(n.Expression)).FirstOrDefault();
                 if (matchParam == null)
                 {
                     Request output = null;
@@ -295,7 +302,7 @@ namespace Botomag.BLL.Implementations
                 lastUpdate.UpdateId = update.Update_Id.Value;
             }
             bot.BotStat.Requests = bot.BotStat.Requests + 1;
-            await _unitOfWork.SaveAsync();
+            _unitOfWork.Save();
 
             //and return response to user!
             Request request = new Request(new SendMessageRequest
@@ -307,38 +314,72 @@ namespace Botomag.BLL.Implementations
             return _telegramBotService.SerializeRequest(request);
         }
 
-        private async Task<IEnumerable<string>> _GetBotNamesByUserId(Guid userId)
+        private IEnumerable<BotModel> _GetBotsByUserId(Guid userId, int? skip = null, int? take = null)
         {
-            Bot[] bots = await Task<Bot[]>.Factory.StartNew(() => 
-                _unitOfWork.GetRepository<Bot, Guid>().Get().Where(n => n.UserId == userId).ToArray());
-            string[] botNames = new string[bots.Length];
-            for (int i = 0; i < bots.Length; ++i )
+            IQueryable<Bot> botsQuery = _unitOfWork.GetRepository<Bot, Guid>().Get().Where(n => n.UserId == userId);
+
+            botsQuery = botsQuery.OrderBy(n => n.Id);
+
+            if (skip.HasValue)
             {
-                Bot updatedBot = await _RefreshBotName(bots[i]);
-                if (bots[i].Name != updatedBot.Name)
-                {
-                    bots[i].Name = updatedBot.Name;
-                    bots[i].LastUpdate = updatedBot.LastUpdate;
-                }
-                else
-                {
-                    if (bots[i].LastUpdate != updatedBot.LastUpdate)
-                    {
-                        bots[i].LastUpdate = updatedBot.LastUpdate;
-                    }
-                }
-                botNames[i] = bots[i].Name;
+                botsQuery = botsQuery.Skip(skip.Value);
             }
-            await _unitOfWork.SaveAsync();
-            return botNames;
+
+            if (take.HasValue)
+            {
+                botsQuery = botsQuery.Take(take.Value);
+            }
+
+            Bot[] botsArray = botsQuery.ToArray();
+
+            Task[] botsUpdatedTasks = new Task[botsArray.Length];
+
+            for (int i = 0; i < botsArray.Length; ++i)
+            {
+                int currentIndex = i;
+                botsUpdatedTasks[i] = Task.Factory.StartNew(() =>
+                    {
+                        Bot updatedBot = _RefreshBotName(botsArray[currentIndex]);
+                        if (botsArray[currentIndex].Name != updatedBot.Name)
+                        {
+                            botsArray[currentIndex].Name = updatedBot.Name;
+                            botsArray[currentIndex].LastUpdate = updatedBot.LastUpdate;
+                        }
+                        else
+                        {
+                            if (botsArray[currentIndex].LastUpdate != updatedBot.LastUpdate)
+                            {
+                                botsArray[currentIndex].LastUpdate = updatedBot.LastUpdate;
+                            }
+                        }
+                    });
+            }
+
+            Task<Bot>.WaitAll(botsUpdatedTasks);
+
+            _unitOfWork.Save();
+
+            for (int i = 0; i < botsArray.Length; ++i)
+            {
+                botsArray[i].InvalidCommandResponse = null;
+                botsArray[i].LastUpdates = null;
+                botsArray[i].User = null;
+                botsArray[i].BotStat = null;
+                botsArray[i].Commands = null;
+            }
+
+            BotModel[] botMapped = _mapper.Map<BotModel[]>(botsArray);
+
+            return botMapped;
+            
         }
 
-        private async Task<Bot> _RefreshBotName(Bot bot)
+        private Bot _RefreshBotName(Bot bot)
         {
             if (!(bot.LastUpdate.HasValue && DateTime.Now - bot.LastUpdate.Value < TimeSpan.FromHours(3) && !string.IsNullOrEmpty(bot.Name)))
             {
                 // refresh bot name every 3 hours
-                Response<UserResponse> botInfo = await _telegramBotService.PostAsync<UserResponse>(bot.Token, new Request(new GetMeRequest()));
+                Response<UserResponse> botInfo = _telegramBotService.Post<UserResponse>(bot.Token, new Request(new GetMeRequest()));
                 if (botInfo.Ok == false)
                 {
                     throw new InvalidOperationException(string.Format("it seems that bot with id {0} has invalid token {1}", bot.Id, bot.Token));
@@ -347,6 +388,11 @@ namespace Botomag.BLL.Implementations
                 bot.LastUpdate = DateTime.Now;  
             }
             return bot;
+        }
+
+        private int _GetBotsCountByUserId(Guid userId)
+        {
+            return _unitOfWork.GetRepository<Bot, Guid>().Get().Where(n => n.UserId == userId).Count();
         }
 
         #endregion Private Methods

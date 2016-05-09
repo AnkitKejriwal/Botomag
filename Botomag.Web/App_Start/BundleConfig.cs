@@ -46,7 +46,7 @@ namespace Botomag
                         "~/Content/owl.carousel.css"));
 
             bundles.Add(new StyleBundle("~/Content/jqGrid").Include(
-                        "ui.jqgrid-bootstrap.css"));
+                        "~/Content/ui.jqgrid-bootstrap.css"));
         }
     }
 }

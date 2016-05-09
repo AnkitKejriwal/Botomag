@@ -18,6 +18,9 @@ namespace Botomag.Web
             config.CreateMap<LoginViewModel, UserModel>().
                 ForMember(trg => trg.PasswordHash, opt => opt.Ignore()).
                 IncludeBase<BaseViewModel<Guid>, BaseModel<Guid>>();
+
+            config.CreateMap<BotModel, BotViewModel>().
+                IncludeBase<BaseModel<Guid>, BaseViewModel<Guid>>();
         }
     }
 }

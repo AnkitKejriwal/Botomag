@@ -16,6 +16,9 @@ namespace Botomag.BLL.Infrastructure
                 ReverseMap().
                 ForMember(trg => trg.Password, opt => opt.Ignore()).
                 IncludeBase<BaseEntity<Guid>, BaseModel<Guid>>();
+
+            config.CreateMap<Bot, BotModel>().
+                IncludeBase<BaseEntity<Guid>, BaseModel<Guid>>();
         }
     }
 }
