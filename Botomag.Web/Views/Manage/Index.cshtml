@@ -9,20 +9,25 @@
 }
 
 <div class="container">
-    <table id="botsGrid"></table>
-    <div id="botsPager"></div>
-    <table id="botDetailsGrid"></table>
+    <div class="row" style="margin-bottom: 50px;">
+        <table id="botsGrid"></table>
+        <div id="botsPager"></div>
+    </div>
+    <div class="row">
+        <table id="botDetailsGrid"></table>
+        <div id="botDetailsPager"></div>
+    </div>
 </div>
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqGrid")
     <script>
     $(document).ready(function () {
-        $("#botsGrid").jqGrid({
+        $('#botsGrid').jqGrid({
             url: '@Url.Action("GetBots")',
-            mtype: "GET",
+            mtype: 'GET',
             styleUI: 'Bootstrap',
-            datatype: "json",
+            datatype: 'json',
             colModel: [
                 { name: 'Id', key: true, hidden: true },
                 { label: 'Имя', name: 'Name', width: 150 },
@@ -32,25 +37,30 @@
             width: 780,
             rowNum: 10,
             rowList: [10, 25, 50],
-            pager: "#botsPager",
+            pager: '#botsPager',
             @*loadError: window.location.href = '@Url.Action("Error", "Base")',*@
             onSelectRow: function (id) {
                 jQuery("#botDetailsGrid").jqGrid('setGridParam', { url: '@Url.Action("GetBotDetails")' + '?id=' + id, page: 1 }).trigger('reloadGrid');
             }
         });
 
-        $("#botDetailsGrid").jqGrid({
+        $('#botDetailsGrid').jqGrid({
             url: '@Url.Action("GetBotDetails")',
-            mtype: "GET",
+            mtype: 'GET',
             styleUI: 'Bootstrap',
-            datatype: "json",
+            datatype: 'json',
             colModel: [
                 { name: 'Id', key: true },
             ],
             viewrecords: true,
-            height: 250,
+            height: 'auto',
             width: 780,
             rowNum: 10,
+            pager: 'botDetailsPager',
+            emptyrecords: 'Выберите бота для просмотра деталей.',
+            pgbuttons: false,
+            pginput: false,
+            recordpos: 'center'
             @*loadError: window.location.href = '@Url.Action("Error", "Base")'*@
         });
 

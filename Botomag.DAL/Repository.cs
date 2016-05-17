@@ -4,6 +4,7 @@ using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Linq.Expressions;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Botomag.DAL
@@ -38,6 +39,13 @@ namespace Botomag.DAL
             return result;
         }
 
+        public IEnumerable<TEntity> AddRange(IEnumerable<TEntity> entity)
+        {
+            IEnumerable<TEntity> result;
+            result = _dbSet.AddRange(entity);
+            return result;
+        }
+
         public TEntity Remove(TEntity entity)
         {
             TEntity result;
@@ -64,6 +72,29 @@ namespace Botomag.DAL
         {
             TEntity entity = await _dbSet.FindAsync(key);
             return entity;
+        }
+
+        public TEntity Attach(TEntity entity)
+        {
+            TEntity result = _dbSet.Attach(entity);
+            return result;
+        }
+
+        public IEnumerable<TEntity> AttachRange(IEnumerable<TEntity> entities)
+        {
+            if (entities == null)
+            {
+                return null;
+            }
+
+            List<TEntity> results = new List<TEntity>();
+
+            foreach(TEntity entity in entities)
+            {
+                results.Add(Attach(entity));
+            }
+
+            return results;
         }
     }
 }

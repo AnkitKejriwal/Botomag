@@ -51,7 +51,7 @@ namespace Botomag.Web.Controllers
             try
             {
 
-                bots = await _botService.GetBotsByUserIdAsync(UserId.Value, (page - 1) * rows, rows);
+                bots = await _botService.GetBotsNamesByUserIdAsync(UserId.Value, (page - 1) * rows, rows);
                 count = await _botService.GetBotsCountByUserIdAsync(UserId.Value);
             }
             catch
@@ -71,18 +71,35 @@ namespace Botomag.Web.Controllers
                     // param number of total rows
                     records = count,
                     rows = bots.ToArray()
-                } 
+                }
             };
         }
 
-        public async Task<JsonResult> GetBotDetails(Guid? id)
+        public async Task<JsonResult> GetBotDetails(Guid? id = null)
         {
-            return new JsonResult 
-            { 
-                Data = new 
+            //if id == null we just return empty object 
+            //for appropriate reflecting empty bot details table
+            if (!id.HasValue)
+            {
+                return new JsonResult 
                 {
-                    rows = new object[] { }
-                },
+
+                    Data = new  { rows = new BotModel[0], page = 0, total = 0, records = 0 },
+                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
+                };
+            }
+
+            BotModel bot = await _botService.GetBotByIdAsync(id.Value);
+
+            if (bot == null)
+            {
+                Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return new JsonResult { JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            }
+
+            return new JsonResult
+            {
+                Data = new { rows = bot, page = 1, total = 1, records = 1 },
                 JsonRequestBehavior = JsonRequestBehavior.AllowGet
             };
         }

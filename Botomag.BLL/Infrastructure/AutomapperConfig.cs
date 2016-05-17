@@ -19,6 +19,21 @@ namespace Botomag.BLL.Infrastructure
 
             config.CreateMap<Bot, BotModel>().
                 IncludeBase<BaseEntity<Guid>, BaseModel<Guid>>();
+
+            config.CreateMap<LastUpdate, LastUpdateModel>().
+                IncludeBase<BaseEntity<Guid>, BaseModel<Guid>>();
+
+            config.CreateMap<BotStat, BotStatModel>().
+                IncludeBase<BaseEntity<Guid>, BaseModel<Guid>>();
+
+            config.CreateMap<Response, ResponseModel>().
+                IncludeBase<BaseEntity<Guid>, BaseModel<Guid>>();
+
+            config.CreateMap<Parameter, ParameterModel>().
+                IncludeBase<BaseEntity<Guid>, BaseModel<Guid>>();
+
+            config.CreateMap<Command, CommandModel>().
+                IncludeBase<BaseEntity<Guid>, BaseModel<Guid>>();
         }
     }
 }

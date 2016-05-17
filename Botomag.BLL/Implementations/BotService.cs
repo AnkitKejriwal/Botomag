@@ -5,7 +5,9 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using System.Linq.Expressions;
+using System.Data.Entity;
 
 using Botomag.BLL.Contracts;
 using Botomag.DAL;
@@ -57,14 +59,36 @@ namespace Botomag.BLL.Implementations
             return Task<string>.Factory.StartNew(() => _ProcessUpdate(botId, stream));
         }
 
-        public Task<IEnumerable<BotModel>> GetBotsByUserIdAsync(Guid userId, int? skip = null, int? take = null)
+        /// <summary>
+        /// Get bot of appropriate user
+        /// </summary>
+        /// <param name="userId">User Id</param>
+        /// <param name="skip">Number of skipped items in result sequence</param>
+        /// <param name="take">Number of taked items in result sequence</param>
+        /// <returns>Task which must return result sequence</returns>
+        public Task<IEnumerable<BotModel>> GetBotsNamesByUserIdAsync(Guid userId, int? skip = null, int? take = null)
         {
-            return Task<IEnumerable<BotModel>>.Factory.StartNew(() => _GetBotsByUserId(userId, skip, take));
+            return Task<IEnumerable<BotModel>>.Factory.StartNew(() => _GetBotsNamesByUserId(userId, skip, take));
         }
 
+        /// <summary>
+        /// Get the number of all bots of appropriate user
+        /// </summary>
+        /// <param name="userId">User Id</param>
+        /// <returns>number of all bots</returns>
         public Task<int> GetBotsCountByUserIdAsync(Guid userId)
         {
             return Task<int>.Factory.StartNew(() => _GetBotsCountByUserId(userId));
+        }
+
+        /// <summary>
+        /// Get Bot with appropriate Id
+        /// </summary>
+        /// <param name="botId">Bot Id</param>
+        /// <returns>Bot Model</returns>
+        public Task<BotModel> GetBotByIdAsync(Guid botId)
+        {
+            return Task<BotModel>.Factory.StartNew(() => _GetBotById(botId));
         }
 
         #endregion Public Methods
@@ -148,7 +172,7 @@ namespace Botomag.BLL.Implementations
                 }
 
                 // get bot name
-                bot = _RefreshBotName(bot);
+                _RefreshBotName(ref bot);
                 string botName = bot.Name;
 
                 Regex botNameRegEx = new Regex(@"^@" + botName + @"$");
@@ -314,9 +338,11 @@ namespace Botomag.BLL.Implementations
             return _telegramBotService.SerializeRequest(request);
         }
 
-        private IEnumerable<BotModel> _GetBotsByUserId(Guid userId, int? skip = null, int? take = null)
+        private Bot[] _GetBotsByUserId(Guid userId, int? skip = null, int? take = null, bool copy = false)
         {
-            IQueryable<Bot> botsQuery = _unitOfWork.GetRepository<Bot, Guid>().Get().Where(n => n.UserId == userId);
+            IRepository<Bot, Guid> botRepo = _unitOfWork.GetRepository<Bot, Guid>();
+
+            IQueryable<Bot> botsQuery = botRepo.Get().Where(n => n.UserId == userId);
 
             botsQuery = botsQuery.OrderBy(n => n.Id);
 
@@ -329,52 +355,50 @@ namespace Botomag.BLL.Implementations
             {
                 botsQuery = botsQuery.Take(take.Value);
             }
+            
+            if (copy)
+            {
+                botsQuery = botsQuery.AsNoTracking();
+            }
 
             Bot[] botsArray = botsQuery.ToArray();
 
-            Task[] botsUpdatedTasks = new Task[botsArray.Length];
-
-            for (int i = 0; i < botsArray.Length; ++i)
+            if (copy)
             {
-                int currentIndex = i;
-                botsUpdatedTasks[i] = Task.Factory.StartNew(() =>
-                    {
-                        Bot updatedBot = _RefreshBotName(botsArray[currentIndex]);
-                        if (botsArray[currentIndex].Name != updatedBot.Name)
-                        {
-                            botsArray[currentIndex].Name = updatedBot.Name;
-                            botsArray[currentIndex].LastUpdate = updatedBot.LastUpdate;
-                        }
-                        else
-                        {
-                            if (botsArray[currentIndex].LastUpdate != updatedBot.LastUpdate)
-                            {
-                                botsArray[currentIndex].LastUpdate = updatedBot.LastUpdate;
-                            }
-                        }
-                    });
+                botRepo.AttachRange(botsArray);
+
+                _unitOfWork.Save();
             }
 
-            Task<Bot>.WaitAll(botsUpdatedTasks);
+            return botsArray;
+        }
 
-            _unitOfWork.Save();
+        private IEnumerable<BotModel> _GetBotsNamesByUserId(Guid userId, int? skip = null, int? take = null)
+        {
+            Bot[] botsArray = _GetBotsByUserId(userId, skip, take, true);
 
             for (int i = 0; i < botsArray.Length; ++i)
             {
+                botsArray[i].BotStat = null;
+                botsArray[i].Commands = null;
                 botsArray[i].InvalidCommandResponse = null;
                 botsArray[i].LastUpdates = null;
                 botsArray[i].User = null;
-                botsArray[i].BotStat = null;
-                botsArray[i].Commands = null;
             }
 
             BotModel[] botMapped = _mapper.Map<BotModel[]>(botsArray);
 
-            return botMapped;
-            
+            return botMapped; 
         }
 
-        private Bot _RefreshBotName(Bot bot)
+        private IEnumerable<BotModel> _GetBotsNamesByUserId(Guid userId)
+        {
+            IRepository<Bot, Guid> botRepo = _unitOfWork.GetRepository<Bot, Guid>();
+            return Get<Bot, BotModel, Guid>(botRepo, n => n.UserId == userId, null, n => n.Name, n => n.Id);
+
+        }
+
+        private void _RefreshBotName(ref Bot bot)
         {
             if (!(bot.LastUpdate.HasValue && DateTime.Now - bot.LastUpdate.Value < TimeSpan.FromHours(3) && !string.IsNullOrEmpty(bot.Name)))
             {
@@ -387,12 +411,21 @@ namespace Botomag.BLL.Implementations
                 bot.Name = botInfo.Result.UserName;
                 bot.LastUpdate = DateTime.Now;  
             }
-            return bot;
         }
 
         private int _GetBotsCountByUserId(Guid userId)
         {
             return _unitOfWork.GetRepository<Bot, Guid>().Get().Where(n => n.UserId == userId).Count();
+        }
+
+        private BotModel _GetBotById(Guid botId)
+        {
+            Bot bot = _unitOfWork.GetRepository<Bot, Guid>().Get().Where(n => n.Id == botId).
+                Include(n => n.BotStat).
+                Include(n => n.Commands.Select(p => p.Parameters.Select(q => q.Response))).
+                Include(n => n.InvalidCommandResponse).FirstOrDefault();
+            BotModel model = _mapper.Map<BotModel>(bot);
+            return model;
         }
 
         #endregion Private Methods
